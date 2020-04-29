@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Rotas</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <style>
+        #map {
+            height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row mt-2">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <select class="form-control" id="sel" name="rotas">
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" onclick="dataSelected()">
+                            <i class="far fa-map"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- The Modal -->
+        <div class="modal fade" id="myModal">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 id="title" class="modal-title"></h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <!-- <iframe src="https://www.google.com/maps/d/embed?mid=1pt_T2fGh1o9gFomRNzzMM-e3OGaxackK" width="640" height="480"></iframe> -->
+                        <div id="map"></div>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="sair()">Sair</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPLTJ3Nhblb5K_hFJb3MoMsJpbo_dGhho"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        var rotas, pointA, pointB;
+        var pontos = [];
+        var select = $('#sel')
+        $(document).ready(function () {
+            axios.get('http://127.0.0.1:3333/lines').then(function (res) {
+                rotas = res.data;
+                insertSelect();
+            }).catch(function (error) {
+                console.log(error);
+            })
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        function insertSelect() {
+            $.each(rotas, function (index, item) {
+                $("#sel").append(
+                    $("<option></option>")
+                        .text(item.number + ' - ' + item.description + ' - ' + item.sense)
+                        .val(item.id)
+                );
+            });
+        }
+
+        function dataSelected() {
+            let element = $('#sel').val();
+            var data = rotas.filter(item => item.id == element);
+            pointA = "" + `${data[0].latA},${data[0].lgtA}` + ""
+            pointB = "" + `${data[0].latB},${data[0].lgtB}` + ""
+            var points = data[0].points
+            points.forEach(item => {
+                pontos.push({ location: `${item.lat},${item.lgt}` })
+            });
+            let title = $("#sel option:selected" ).text();
+            $('#title').text(title);
+
+            openModalMap();
+        }
+
+        function openModalMap() {
+            $('#myModal').modal()
+            initMap()
+        }
+
+        var marker, i;
+        var markers = [];
+
+        function initMap() {
+            directionsDisplay = new google.maps.DirectionsRenderer({
+                suppressMarkers: false
+            });
+            var infowindow = new google.maps.InfoWindow();
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 14,
+                center: { lat: 2.8038037, lng: -60.7055189 },
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                disableDefaultUI: false
+            });
+
+            var directionsService = new google.maps.DirectionsService;
+            var directionsRenderer = new google.maps.DirectionsRenderer({
+                draggable: true,
+                map: map
+            });
+
+
+            // displayRoute('2.815051, -60.669868', '2.783526, -60.720055', directionsService,
+            //     directionsRenderer);
+            displayRoute(pointA, pointB, directionsService,
+                directionsRenderer);
+
+            // for (i = 0; i < pontos.length; i++) {
+            //     var arr = pontos[i].location
+            //     var result = arr.split(',')
+            //     marker = new google.maps.Marker({
+            //         position: new google.maps.LatLng(result[0], result[1]),
+            //         map: map
+            //     });
+
+            //     markers.push(marker);
+
+            //     google.maps.event.addListener(marker, 'mouseover', (function (marker, i) {
+            //         return function () {
+            //             infowindow.setContent('Parada ' + (i + 1));
+            //             infowindow.open(map, marker);
+            //         }
+            //     })(marker, i));
+            // }
+        }
+
+        // {location: '2.820164, -60.673645'}, {location: '2.804934, -60.686934'}
+        //   2.821936, -60.673365
+
+        function displayRoute(origin, destination, service, display) {
+            service.route({
+                origin: origin,
+                destination: destination,
+                waypoints: pontos,
+                travelMode: 'WALKING',
+                avoidTolls: true
+            }, function (response, status) {
+                if (status === 'OK') {
+                    display.setDirections(response);
+                } else {
+                    alert('Could not display directions due to: ' + status);
+                }
+            });
+        }
+
+      function sair() {
+        // window.close()
+        location.reload(true);
+      }
+
+    </script>
+</body>
+
+</html>
