@@ -1,19 +1,5 @@
 <template>
   <div id="app">
-    <dashboard />
+    <router-view />
   </div>
 </template>
-
-<script>
-import Dashboard from './views/Dashboard'
-
-export default {
-  name: 'app',
-  components: {
-    Dashboard
-  },
-}
-</script>
-
-<style>
-</style>

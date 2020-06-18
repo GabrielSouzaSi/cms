@@ -6,7 +6,7 @@
           <b-input-group size="sm">
             <b-form-input v-model="filter" type="search" id="filterInput" placeholder="Pesquisar"></b-form-input>
             <b-input-group-append>
-              <b-button :disabled="!filter" @click="filter = ''" variant="danger">Limpar</b-button>
+              <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
@@ -27,15 +27,14 @@
           :fields="fields"
           :per-page="perPage"
           :filter="filter"
-          head-variant="light"
           :filterIncludedFields="filterOn"
           :current-page="currentPage"
           :sort-by.sync="sortBy"
-          no-border-collapse
-          bordered
           hover
+          striped
           responsive
-          class="text-center"
+          borderless
+          class="text-center rounded-lg shadow-lg"
         >
           <template v-slot:cell(actions)="data" class="text-center">
             <b-button-group size="sm">
@@ -103,15 +102,14 @@ export default {
         {
           key: "number",
           label: "Nº",
-          sortable: true,
-          variant: "info"
+          sortable: true
         },
         {
           key: "sense",
           label: "Sentido"
         },
         {
-          key: "adress",
+          key: "address",
           label: "Endereço"
         },
         {
@@ -127,7 +125,7 @@ export default {
           label: "Longitude"
         },
         {
-          key: "climatizado",
+          key: "air-conditioning",
           label: "Climatizado",
           formatter: value => {
             return value ? "Sim" : "Não";
@@ -138,7 +136,7 @@ export default {
           label: "Ações"
         }
       ],
-      sortBy: 'number',
+      sortBy: "number",
       currentPage: 1,
       totalRows: 1,
       perPage: 5,
@@ -152,18 +150,16 @@ export default {
       showDismissibleAlert: false
     };
   },
-  created() {
+  created() {    
     this.items = this.table;
     this.totalRows = this.items.length;
     barramento.$on("alert", message => {
-      this.alertTitle = message
+      this.alertTitle = message;
       this.dismissCountDown = this.dismissSecs;
     });
   },
   methods: {
     modal(data) {
-      console.log(data);
-
       barramento.$emit("point", data);
     },
     append() {
@@ -194,12 +190,17 @@ export default {
         this.$http
           .delete(`points/${id}`)
           .then(res => {
-            console.log(res)
-            barramento.$emit("delPoint", 'Parada excluída com Secesso! Esse aviso será encerrado em ')
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
+            if (res) {
+              barramento.$emit(
+                "delPoint",
+                "Parada excluída com Secesso! Esse aviso será encerrado em "
+              );
+            }
+          })
+          .catch(function(error) {
+            barramento.$emit("loadMain", false);
+            console.log(error);
+          });
       }
     },
     upArray(value) {
@@ -226,3 +227,5 @@ export default {
   }
 };
 </script>
+<style>
+</style>

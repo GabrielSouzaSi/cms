@@ -1,0 +1,46 @@
+            ## LINES
+GET         http://104.248.225.49/api/lines
+POST        http://104.248.225.49/api/lines
+DELETE      http://104.248.225.49/api/lines/{line}
+PUT         http://104.248.225.49/api/lines/{line}
+GET         http://104.248.225.49/api/lines/{line}
+
+GET         http://104.248.225.49/api/lines/{line}/points
+POST        http://104.248.225.49/api/lines/{line}/points
+PUT         http://104.248.225.49/api/lines/{line}/points/detach
+PUT         http://104.248.225.49/api/lines/{line}/points/sync
+DELETE      http://104.248.225.49/api/lines/{line}/points/{point}
+PUT         http://104.248.225.49/api/lines/{line}/points/{point}
+GET         http://104.248.225.49/api/lines/{line}/points/{point}
+
+GET         http://104.248.225.49/api/lines/{line}/schedules
+POST        http://104.248.225.49/api/lines/{line}/schedules
+DELETE      http://104.248.225.49/api/lines/{line}/schedules/{schedule}
+PUT         http://104.248.225.49/api/lines/{line}/schedules/{schedule}
+GET         http://104.248.225.49/api/lines/{line}/schedules/{schedule}
+
+            ## POINTS
+POST        http://104.248.225.49/api/points
+GET         http://104.248.225.49/api/points
+GET         http://104.248.225.49/api/points/{point}
+DELETE      http://104.248.225.49/api/points/{point}
+PUT         http://104.248.225.49/api/points/{points}
+GET         http://104.248.225.49/api/points/{points}/lines
+POST        http://104.248.225.49/api/points/{points}/lines
+PUT         http://104.248.225.49/api/points/{points}/lines/detach
+PUT         http://104.248.225.49/api/points/{points}/lines/sync
+GET         http://104.248.225.49/api/points/{points}/lines/{line}
+DELETE      http://104.248.225.49/api/points/{points}/lines/{line}
+PUT         http://104.248.225.49/api/points/{points}/lines/{line}
+
+            ## SCHEDULES
+GET         http://104.248.225.49/api/schedules
+POST        http://104.248.225.49/api/schedules
+GET         http://104.248.225.49/api/schedules/{schedule}
+PUT         http://104.248.225.49/api/schedules/{schedule}
+DELETE      http://104.248.225.49/api/schedules/{schedule}
+GET         http://104.248.225.49/api/schedules/{schedule}/lines
+POST        http://104.248.225.49/api/schedules/{schedule}/lines
+GET         http://104.248.225.49/api/schedules/{schedule}/lines/{line}
+PUT         http://104.248.225.49/api/schedules/{schedule}/lines/{line}
+DELETE      http://104.248.225.49/api/schedules/{schedule}/lines/{line}

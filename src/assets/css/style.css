@@ -27,7 +27,8 @@ a, a:hover, a:focus {
     border: none;
     border-radius: 0;
     margin-bottom: 40px;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .navbar-btn {
@@ -145,6 +146,51 @@ a.article, a.article:hover {
 #data {
     padding: 20px;
 }
+
+/* ---------------------------------------------------
+    Table
+----------------------------------------------------- */
+
+thead {
+    font-family: sans-serif !important;
+    font-weight: normal !important;
+    color: #fff !important;
+    background: darkgray !important;
+}
+
+/* ---------------------------------------------------
+    Button Floating
+----------------------------------------------------- */
+
+.float {
+    position: fixed;
+    bottom: 3rem;
+    right: 3rem;
+    cursor: pointer;
+  }
+  .float:hover {
+  bottom: 3.1rem;
+  opacity: 0.9;
+  }
+
+/* ---------------------------------------------------
+    Animations
+----------------------------------------------------- */
+
+.animation {
+    animation: cardchart 1s;
+  }
+  
+  @keyframes cardchart {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
 /* ---------------------------------------------------
     MEDIAQUERIES

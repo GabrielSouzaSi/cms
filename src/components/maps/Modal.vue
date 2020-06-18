@@ -47,7 +47,7 @@
                     id="adress"
                     placeholder="Endereço"
                     name="adress"
-                    v-model.trim="form.adress"
+                    v-model.trim="form.address"
                   />
                 </div>
               </div>
@@ -102,7 +102,7 @@
                       class="form-check-input"
                       name="optradio"
                       v-model="form.climatizado"
-                      :value="true"
+                      value="true"
                     />Sim
                   </label>
                 </div>
@@ -115,7 +115,7 @@
                       class="form-check-input"
                       name="optradio"
                       v-model="form.climatizado"
-                      :value="false"
+                      value="false"
                     />Não
                   </label>
                 </div>
@@ -169,7 +169,7 @@ export default {
         id: null,
         number: null,
         sense: "",
-        adress: "",
+        address: "",
         district: "",
         lat: "",
         lgt: "",
@@ -238,25 +238,28 @@ export default {
     ];
     this.selectDistrict = district;
     barramento.$on("point", point => {
+      
+      // var data = Object.values(point)
+      console.log(point);
+      
+      
       if (point) {
         this.add = false
         this.point = point;
         this.form.id = point.id;
         this.form.number = point.number;
         this.form.sense = point.sense;
-        this.form.adress = point.adress;
+        this.form.address = point.address;
         this.form.district = point.district;
         this.form.lat = point.lat;
         this.form.lgt = point.lgt;
-        this.form.climatizado = point.climatizado;
-      } else {
-        console.log('ok');
-        
+        this.form.climatizado = point["air-conditioning"];
+      } else {        
         this.add = true
         this.form.id = null;
         this.form.number = null;
         this.form.sense = "";
-        this.form.adress = "";
+        this.form.address = "";
         this.form.district = "";
         this.form.lat = "";
         this.form.lgt = "";
@@ -270,11 +273,11 @@ export default {
       if (
         value.number == this.point.number &&
         value.sense == this.point.sense &&
-        value.adress == this.point.adress &&
+        value.address == this.point.address &&
         value.district == this.point.district &&
         value.lat == this.point.lat &&
         value.lgt == this.point.lgt &&
-        value.climatizado == this.point.climatizado
+        value.address == this.point["air-conditioning"]
       ) {
         $("#editPoint").modal('hide')
         barramento.$emit("alert", 'Os dados não foram alterados! Esse aviso será encerrado em ')
@@ -283,11 +286,11 @@ export default {
       .put(`points/${value.id}`, {
         number: value.number,
         sense: value.sense,
-        adress: value.adress,
+        address: value.address,
         district: value.district,
         lat: value.lat,
         lgt: value.lgt,
-        climatizado: value.climatizado
+        'air-conditioning': Boolean(value.climatizado)
       })
       .then(res => {
         console.log(res.data);
@@ -299,20 +302,19 @@ export default {
       })
       }
     },
-    addPoint(value) {
+    addPoint(value) { 
       console.log(value);
       this.$http
         .post("points", {
         number: value.number,
         sense: value.sense,
-        adress: value.adress,
+        address: value.address,
         district: value.district,
         lat: value.lat,
         lgt: value.lgt,
-        climatizado: value.climatizado,
+        "air-conditioning": Boolean(value.climatizado),
         })
         .then(res => {
-          console.log(res.data.number); 
            $("#editPoint").modal('hide')
            barramento.$emit("creatPoint", 'Parada Nº'+ res.data.number + ' criado com sucesso! Esse aviso será encerrado em ')
         })
