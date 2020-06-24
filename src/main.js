@@ -4,11 +4,18 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import router from './routes'
 import Multiselect from 'vue-multiselect'
 import VuePapaParse from 'vue-papa-parse'
+import * as VueGoogleMaps from "vue2-google-maps";
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.component('multiselect', Multiselect)
 Vue.use(VuePapaParse)
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: 'AIzaSyChqJU09uJAwXmgN1uWlYfbSpZbPCEPG2Y',
+    // libraries: 'places'
+  }
+});
 
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'

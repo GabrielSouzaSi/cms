@@ -83,6 +83,7 @@
     <Modal />
     <ModalRota :points="points" />
     <ModalBus :lines="lines" />
+    <ModalMap :lines="lines" />
   </b-container>
 </template>
 
@@ -95,6 +96,7 @@ import Table from "./Table";
 import Modal from "./Modal";
 import ModalRota from "./ModalRota";
 import ModalBus from "./ModalBus";
+import ModalMap from "./ModalMap";
 
 export default {
   components: {
@@ -102,7 +104,8 @@ export default {
     Table,
     Modal,
     ModalRota,
-    ModalBus
+    ModalBus,
+    ModalMap
   },
   data() {
     return {
@@ -154,35 +157,14 @@ export default {
       this.$http
         .get(`lines/${this.selected}/points`)
         .then(res => {
-        this.table = res.data.points
+          this.table = res.data.points;
         })
         .catch(function(error) {
           console.log(error);
         });
-
-      // let line_point = this.lines.filter(item => item.id == this.selected);
-      // let data = line_point.map(item => item.points);
-
-      // this.table = data[0].map(
-      //   ({ id, number, sense, adress, district, lat, lgt, climatizado }) => ({
-      //     id,
-      //     number,
-      //     sense,
-      //     adress,
-      //     district,
-      //     lat,
-      //     lgt,
-      //     climatizado
-      //   })
-      // );
-      // console.log(index)
     },
     openModalMap() {
-      window.open(
-        "rotas.html",
-        "_blank",
-        "toolbar=yes,scrollbars=yes,resizable=yes,top=100"
-      );
+      barramento.$emit("mMap", true);
     },
     addPoint() {
       barramento.$emit("point", false);
@@ -193,7 +175,7 @@ export default {
         .then(res => {
           this.selected = "";
           this.table = res.data;
-          this.points = res.data;      
+          this.points = res.data;
         })
         .catch(function(error) {
           console.log(error);
@@ -201,18 +183,17 @@ export default {
     },
     creatLine() {
       barramento.$emit("line", false);
-      
     },
     editLines() {
       if (this.selected) {
         this.$http
-        .get(`lines/${this.selected}/points`)
-        .then(res => {           
-          barramento.$emit("line", res.data);        
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
+          .get(`lines/${this.selected}/points`)
+          .then(res => {
+            barramento.$emit("line", res.data);
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
         // let line_points = this.lines.filter(item => item.id == this.selected);
       } else {
         barramento.$emit(
@@ -230,7 +211,6 @@ export default {
           });
           barramento.$emit("loadMain", false);
           this.selected ? this.pointsArray() : this.getPoints();
-          
         })
         .catch(function(error) {
           console.log(error);
