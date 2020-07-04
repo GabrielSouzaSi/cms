@@ -15,7 +15,7 @@
             <b-form>
               <b-form-input
                 id="input-1"
-                v-model="user.email"
+                v-model="user.username"
                 type="email"
                 required
                 placeholder="Email"
@@ -50,9 +50,7 @@
       <div>
         <h3>
           <ul>
-            <li v-for="erro in erros" :key="erro">
-              {{erro}}
-            </li>
+            <li v-for="erro in erros" :key="erro">{{erro}}</li>
           </ul>
         </h3>
       </div>
@@ -61,13 +59,17 @@
 </template>
 
 <script>
-import login from "../auth/auth";
+// import login from "../auth/auth";
+// import axios from "axios";
 export default {
   data() {
     return {
       user: {
-        email: "",
-        password: ""
+        grant_type: "password",
+        client_id: 4,
+        client_secret: "sKrQEaNwbvQonv0g15ROvgRiGUYDpgJhoEBN51i8",
+        username: "gos.gabriel@gmail.com",
+        password: "qwert1234"
       },
       storegeUser: {
         name: "",
@@ -76,7 +78,7 @@ export default {
         authorizedUser: false
       },
       checked: null,
-      erros: [],
+      erros: []
     };
   },
   mounted() {
@@ -91,10 +93,10 @@ export default {
   methods: {
     onSubmit(evt) {
       evt.preventDefault();
-      this.erros = []
-      if (this.user.email == '') this.erros.push("Email não informado.");
-      if (this.user.password == '') this.erros.push("Senha não informado.");      
-      if (this.user.email && this.user.email) {
+      this.erros = [];
+      if (this.user.username == "") this.erros.push("Email não informado.");
+      if (this.user.password == "") this.erros.push("Senha não informado.");
+      if (this.user.username && this.user.password) {
         this.loginUser();
       } else {
         this.$bvModal.show("modalLogin");
@@ -104,27 +106,42 @@ export default {
       this.$router.push({ path: "/" });
     },
     async loginUser() {
-      fetch(`http://agendamentopresencial.jucerr.rr.gov.br/api/admin/login`, {
-        method: "post",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(this.user)
-      })
-        .then(response => response.json())
-        .then(json => {
-          if (json.token) {
-            this.storegeUser.name = json.user.name;
-            this.storegeUser.email = json.user.email;
-            this.storegeUser.token = json.token;
-            this.storegeUser.authorizedUser = true;
-            login.saveUser(this.storegeUser);
-            this.$router.push("/");
-          } else {
-            json.errors ? alert(json.errors) : alert(json.message);
-          }
-        });
+      var myHeaders = {
+        "Access-Control-Allow-Origin": "*",
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      };
+
+      const raw = JSON.stringify({
+        grant_type: "password",
+        client_id: 4,
+        client_secret: "sKrQEaNwbvQonv0g15ROvgRiGUYDpgJhoEBN51i8",
+        username: "gos.gabriel@gmail.com",
+        password: "qwert1234"
+      });
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        mode: "no-cors",
+        body: raw
+      };
+
+      // axios
+      //   .post("http://104.248.225.49/oauth/token", requestOptions)
+      //   .then(res => {
+      //     console.log(res);
+      //   })
+      //   .catch(function(error) {
+      //     console.log(error);
+      //   });
+
+      try {
+        const res = await this.$http.post("/oauth/token", requestOptions)
+        if(res.ok) console.log(res);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 };

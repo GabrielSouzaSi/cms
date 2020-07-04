@@ -1,4 +1,37 @@
+{
+    grant_type: password,
+    client_id: 2,
+    client_secret: sKrQEaNwbvQonv0g15ROvgRiGUYDpgJhoEBN51i8,
+    username: user@email.com,
+    password: secret123,
+}
+
+            client_secret: sKrQEaNwbvQonv0g15ROvgRiGUYDpgJhoEBN51i8
+            client_id: 4
+
+            ## AUTH
+
+POST         http://104.248.225.49/api/auth/register
+POST         http://104.248.225.49/oauth/token
+
+            ## CATEGORIES
+
+GET         http://104.248.225.49/api/categories
+POST        http://104.248.225.49/api/categories
+DELETE      http://104.248.225.49/api/categories/{category}
+GET         http://104.248.225.49/api/categories/{category}
+PUT         http://104.248.225.49/api/categories/{category}
+
+            ## EVENTS
+
+GET         http://104.248.225.49/api/events
+POST        http://104.248.225.49/api/events
+GET         http://104.248.225.49/api/events/{event}
+PUT         http://104.248.225.49/api/events/{event}
+DELETE      http://104.248.225.49/api/events/{event}
+
             ## LINES
+
 GET         http://104.248.225.49/api/lines
 POST        http://104.248.225.49/api/lines
 DELETE      http://104.248.225.49/api/lines/{line}
@@ -20,6 +53,7 @@ PUT         http://104.248.225.49/api/lines/{line}/schedules/{schedule}
 GET         http://104.248.225.49/api/lines/{line}/schedules/{schedule}
 
             ## POINTS
+
 POST        http://104.248.225.49/api/points
 GET         http://104.248.225.49/api/points
 GET         http://104.248.225.49/api/points/{point}
@@ -34,6 +68,7 @@ DELETE      http://104.248.225.49/api/points/{points}/lines/{line}
 PUT         http://104.248.225.49/api/points/{points}/lines/{line}
 
             ## SCHEDULES
+
 GET         http://104.248.225.49/api/schedules
 POST        http://104.248.225.49/api/schedules
 GET         http://104.248.225.49/api/schedules/{schedule}
