@@ -15,7 +15,7 @@
             <div class="row">
               <div class="col">
                 <div class="input-group mb-3">
-                  <select class="form-control" @change="select" v-model="selected">
+                  <select class="form-control" @change="select(selected)" v-model="selected">
                     <option value disabled selected>Selecionar Rota</option>
                     <option
                       v-for="(value, index) in lines"
@@ -134,6 +134,12 @@
                         >
                           <b-icon-check></b-icon-check>
                         </b-button>
+                        <b-button
+                          variant="primary"
+                          @click="upCar(temp[`${radio}`][row.index].busId, row.item)"
+                        >
+                          <b-icon-arrow-up-down></b-icon-arrow-up-down>
+                        </b-button>
                       </b-input-group-append>
                     </b-input-group>
                   </template>
@@ -173,369 +179,383 @@ import $ from "jquery";
 import barramento from "@/eventBus/barramento";
 export default {
   props: {
+    // todas as linha
     lines: {
-      type: Array
-    }
+      type: Array,
+    },
+    // id da linha
+    // id: {
+    //   type: Number
+    // }
   },
   data() {
     return {
       show: false,
       showTable: false,
       add: null,
-      radio: "weekday",
+      radio: "1",
       radioTemp: true,
-      selected: "",
+      selected: this.id,
       options: [
-        { text: "Dia Útil", value: "weekday" },
-        { text: "Sábado", value: "saturday" },
-        { text: "Domingo", value: "sunday" }
+        { text: "Dia Útil", value: "1" },
+        { text: "Sábado", value: "6" },
+        { text: "Domingo", value: "0" },
       ],
       table: [],
       temp: [],
       form: {
         start: "",
         end: "",
-        busId: ""
+        busId: "",
+        bus: "",
       },
       fields: [
         {
           key: "index",
-          label: "Nº"
+          label: "Nº",
         },
         {
           key: "start",
-          label: "Saída"
+          label: "Saída",
         },
         {
           key: "end",
-          label: "Chegada"
+          label: "Chegada",
         },
         {
           key: "busId",
           label: "Ônibus",
-          formatter: value => {
-            var data = this.bus.filter(item => item.value == value);
+          formatter: (value) => {
+            var data = this.bus.filter((item) => item.value == value);
             return data[0];
-          }
+          },
         },
         {
           key: "actions",
-          label: "Ações"
-        }
+          label: "Ações",
+        },
       ],
       hour: [],
       bus: [
         {
+          value: 1,
+          text: "NÃO INFORMADO",
+        },
+        {
           value: 17,
-          text: "CAR1109"
+          text: "CAR1109",
         },
         {
           value: 82,
-          text: "CAR1110"
+          text: "CAR1110",
         },
         {
           value: 117,
-          text: "CAR1111"
+          text: "CAR1111",
         },
         {
           value: 114,
-          text: "CAR1112"
+          text: "CAR1112",
         },
         {
           value: 22,
-          text: "CAR1113"
+          text: "CAR1113",
         },
         {
           value: 18,
-          text: "CAR1114"
+          text: "CAR1114",
         },
         {
           value: 13,
-          text: "CAR1115"
+          text: "CAR1115",
         },
         {
           value: 35,
-          text: "CAR1201"
+          text: "CAR1201",
         },
         {
           value: 44,
-          text: "CAR1202"
+          text: "CAR1202",
         },
         {
           value: 21,
-          text: "CAR1203"
+          text: "CAR1203",
         },
         {
           value: 99,
-          text: "CAR1204"
+          text: "CAR1204",
         },
         {
           value: 42,
-          text: "CAR1205"
+          text: "CAR1205",
         },
         {
           value: 12,
-          text: "CAR1301"
+          text: "CAR1301",
         },
         {
           value: 25,
-          text: "CAR1302"
+          text: "CAR1302",
         },
         {
           value: 109,
-          text: "CAR1303"
+          text: "CAR1303",
         },
         {
           value: 8,
-          text: "CAR1304"
+          text: "CAR1304",
         },
         {
           value: 95,
-          text: "CAR1305"
+          text: "CAR1305",
         },
         {
           value: 7,
-          text: "CAR1306"
+          text: "CAR1306",
         },
         {
           value: 115,
-          text: "CAR1307"
+          text: "CAR1307",
         },
         {
           value: 10,
-          text: "CAR1308"
+          text: "CAR1308",
         },
         {
           value: 72,
-          text: "CAR1309"
+          text: "CAR1309",
         },
         {
           value: 11,
-          text: "CAR1310"
+          text: "CAR1310",
         },
         {
           value: 110,
-          text: "CAR1311"
+          text: "CAR1311",
         },
         {
           value: 108,
-          text: "CAR1312"
+          text: "CAR1312",
         },
         {
           value: 96,
-          text: "CAR1313"
+          text: "CAR1313",
         },
         {
           value: 112,
-          text: "CAR1314"
+          text: "CAR1314",
         },
         {
           value: 9,
-          text: "CAR1315"
+          text: "CAR1315",
         },
         {
           value: 38,
-          text: "CAR1316"
+          text: "CAR1316",
         },
         {
           value: 88,
-          text: "CAR1317"
+          text: "CAR1317",
         },
         {
           value: 116,
-          text: "CAR1318"
+          text: "CAR1318",
         },
         {
           value: 36,
-          text: "CAR1319"
+          text: "CAR1319",
         },
         {
           value: 5,
-          text: "CAR1320"
+          text: "CAR1320",
         },
         {
           value: 75,
-          text: "CAR1321"
+          text: "CAR1321",
         },
         {
           value: 94,
-          text: "CAR1322"
+          text: "CAR1322",
         },
         {
           value: 107,
-          text: "CAR1323"
+          text: "CAR1323",
         },
         {
           value: 86,
-          text: "CAR1324"
+          text: "CAR1324",
         },
         {
           value: 19,
-          text: "CAR1325"
+          text: "CAR1325",
         },
         {
           value: 118,
-          text: "CAR1401"
+          text: "CAR1401",
         },
         {
           value: 74,
-          text: "CAR1402"
+          text: "CAR1402",
         },
         {
           value: 104,
-          text: "CAR1403"
+          text: "CAR1403",
         },
         {
           value: 119,
-          text: "CAR1404"
+          text: "CAR1404",
         },
         {
           value: 43,
-          text: "CAR1405"
+          text: "CAR1405",
         },
         {
           value: 73,
-          text: "CAR1406"
+          text: "CAR1406",
         },
         {
           value: 6,
-          text: "CAR1407"
+          text: "CAR1407",
         },
         {
           value: 124,
-          text: "CAR1408"
+          text: "CAR1408",
         },
         {
           value: 123,
-          text: "CAR1409"
+          text: "CAR1409",
         },
         {
           value: 85,
-          text: "CAR1801"
+          text: "CAR1801",
         },
         {
           value: 70,
-          text: "CAR1802"
+          text: "CAR1802",
         },
         {
           value: 4,
-          text: "CAR1803"
+          text: "CAR1803",
         },
         {
           value: 120,
-          text: "CAR1804"
+          text: "CAR1804",
         },
         {
           value: 71,
-          text: "CAR2303"
+          text: "CAR2303",
         },
         {
           value: 20,
-          text: "CAR3001"
+          text: "CAR3001",
         },
         {
           value: 40,
-          text: "CAR3002"
+          text: "CAR3002",
         },
         {
           value: 32,
-          text: "CAR3003"
+          text: "CAR3003",
         },
         {
           value: 27,
-          text: "CAR3004"
+          text: "CAR3004",
         },
         {
           value: 28,
-          text: "CAR3005"
+          text: "CAR3005",
         },
         {
           value: 34,
-          text: "CAR3006"
+          text: "CAR3006",
         },
         {
           value: 121,
-          text: "CAR3007"
+          text: "CAR3007",
         },
         {
           value: 29,
-          text: "CAR3008"
+          text: "CAR3008",
         },
         {
           value: 98,
-          text: "CAR3009"
+          text: "CAR3009",
         },
         {
           value: 30,
-          text: "CAR3010"
+          text: "CAR3010",
         },
         {
           value: 81,
-          text: "CAR3012"
+          text: "CAR3012",
         },
         {
           value: 79,
-          text: "CAR3013"
+          text: "CAR3013",
         },
         {
           value: 84,
-          text: "CAR3111"
+          text: "CAR3111",
         },
         {
           value: 37,
-          text: "CAR3112"
+          text: "CAR3112",
         },
         {
           value: 41,
-          text: "CAR3113"
+          text: "CAR3113",
         },
         {
           value: 113,
-          text: "CAR3114"
+          text: "CAR3114",
         },
         {
           value: 89,
-          text: "CAR3117"
+          text: "CAR3117",
         },
         {
           value: 90,
-          text: "CAR3118"
+          text: "CAR3118",
         },
         {
           value: 76,
-          text: "CAR3119"
+          text: "CAR3119",
         },
         {
           value: 39,
-          text: "CAR3201"
+          text: "CAR3201",
         },
         {
           value: 33,
-          text: "CAR3202"
+          text: "CAR3202",
         },
         {
           value: 78,
-          text: "CAR3203"
+          text: "CAR3203",
         },
         {
           value: 122,
-          text: "CAR3204"
+          text: "CAR3204",
         },
         {
           value: 31,
-          text: "CAR3205"
-        }
+          text: "CAR3205",
+        },
       ],
       replyTable: false,
       replyTemp: [],
       schedule: [],
       line_id: null,
-      schedule_id: null
+      schedule_id: null,
     };
   },
   created() {
-    barramento.$on("mSchedule", data => {
-      this.schedule = data;
+    // a função recebe o id da linha selecionada
+    barramento.$on("mSchedule", (data) => {
+      this.schedule = JSON.parse(JSON.stringify(this.lines));
+      this.selected = data;
+      // console.log(data);
+      this.select(data);
       $("#modalBus").modal();
     });
   },
@@ -547,7 +567,13 @@ export default {
       if (this.validBus(data)) {
         alert("O Horário e Ônibus já está em utiliazação");
       } else {
-        this.table[`${this.radio}`].push(data);
+        var bus = this.bus.filter((item) => item.value == data.busId);
+        this.table[`${this.radio}`].push({
+          end: data.end,
+          start: data.start,
+          busId: data.busId,
+          bus: bus[0].text,
+        });
         let result = JSON.parse(JSON.stringify(this.table));
         this.table = result;
         alert("horário adicionado!");
@@ -565,76 +591,84 @@ export default {
       }
     },
     updateHour(hour, row) {
-      console.log(hour, row)
+      // console.log(hour, row)
       let data = JSON.parse(JSON.stringify(hour));
       if (this.validBus(data)) {
         alert("O Horário e Ônibus está em utiliazação!");
       } else {
-        let result = this.table[`${this.radio}`].map(function(item, index) {
+        var bus = this.bus.filter((item) => item.value == data.busId);
+        let result = this.table[`${this.radio}`].map(function (item, index) {
           if (index === row) {
-            return { start: data.start, end: data.end, busId: data.busId };
+            return {
+              start: data.start,
+              end: data.end,
+              busId: data.busId,
+              bus: bus[0].text,
+            };
           } else {
             return item;
           }
         });
-
         this.table[`${this.radio}`] = result;
+        const temp = JSON.parse(JSON.stringify(this.table));
+        this.table = temp;
+        console.log(this.table);
       }
     },
-    select() {
-      let data = this.schedule.filter(item => item.line_id === this.selected);
+    select(id) {
+      let data = this.schedule.filter((item) => item.id === id);
 
-      if (data.length) {
-        this.hour = data[0].hour;
-        this.schedule_id = data[0].id;
-        this.line_id = data[0].line_id
+      // console.log(data[0])
+
+      if (data[0].schedules) {
+        this.hour = data[0].schedules.hour.weekdays;
+        this.schedule_id = data[0].schedules.id;
+        this.line_id = data[0].id;
         this.showTable = true;
       } else {
         alert("A rota ainda não possui uma quadro de horário!");
         this.showTable = true;
         this.add = true;
-        this.hour = { weekday: [], saturday: [], sunday: [] };
+        this.hour = { "0": [], "1": [], "6": [] };
       }
-      this.table = this.hour;
+      this.table = JSON.parse(JSON.stringify(this.hour));
     },
     addSchedule() {
-      // let data = {
-      //   line_id : this.selected,
-      //   hour : this.table
-      // }
-      // console.log(JSON.stringify(data));
-
+      let data = { weekdays: {} };
+      data.weekdays = this.table
       this.$http
-        .post("schedule", {
-          line_id: this.selected,
-          hour: JSON.stringify(this.table)
+        .post(`lines/${this.selected}/schedules`, {
+          hour: data,
         })
-        .then(res => {
+        .then((res) => {
           console.log(res.data);
-          alert('Dados salvos!')
+          alert("Dados salvos!");
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error.response);
         });
+      console.log(this.table)
     },
     upSchedule() {
+      let data = { weekdays: {} };
+      data.weekdays = this.table;
       this.$http
-        .put(`schedule/${this.schedule_id}`, {
-          line_id: this.line_id,
-          hour: JSON.stringify(this.table)
+        .put(`schedules/${this.schedule_id}`, {
+          hour: data,
         })
-        .then(res => {
+        .then((res) => {
           console.log(res.data);
-          alert('Dados atualizados!')
+          alert("Dados atualizados!");
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
+      console.log(this.table);
     },
     validBus(data) {
       return (
         this.table[`${this.radio}`].filter(
-          item =>
+          (item) =>
             item.busId == data.busId &&
             item.start == data.start &&
             item.end == data.end
@@ -656,12 +690,32 @@ export default {
         this.radioTemp = true;
         alert("Dados inseridos!");
       }
-    }
+    },
+    upCar(data, row) {
+      var bus = this.bus.filter((item) => item.value == data);
+      let result = this.table[`${this.radio}`].map(function (item) {
+        // console.log(item.bus,row.bus, bus[0].text);
+        if (item.bus === row.bus) {
+          return {
+            start: item.start,
+            end: item.end,
+            busId: Number(bus[0].value),
+            bus: String(bus[0].text),
+          };
+        } else {
+          return item;
+        }
+      });
+      this.table[`${this.radio}`] = result;
+      const temp = JSON.parse(JSON.stringify(this.table));
+      this.table = temp;
+      console.log(this.table);
+    },
   },
   watch: {
     table(v1) {
       this.temp = JSON.parse(JSON.stringify(v1));
-    }
-  }
+    },
+  },
 };
 </script>

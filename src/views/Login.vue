@@ -59,29 +59,28 @@
 </template>
 
 <script>
-// import login from "../auth/auth";
-// import axios from "axios";
+import login from "../auth/auth";
+import axios from "axios";
 export default {
   data() {
     return {
       user: {
         grant_type: "password",
         client_id: 4,
-        client_secret: "sKrQEaNwbvQonv0g15ROvgRiGUYDpgJhoEBN51i8",
         username: "gos.gabriel@gmail.com",
-        password: "qwert1234"
+        password: "qwert1234",
       },
       storegeUser: {
-        name: "",
         email: "",
         token: "",
-        authorizedUser: false
+        authorizedUser: false,
       },
       checked: null,
-      erros: []
+      erros: [],
     };
   },
   mounted() {
+    // console.log(process.env.VUE_APP_ROOT_API)
     document.title = "Login";
     const data = JSON.parse(localStorage.getItem("storageUserBv"));
     if (data) {
@@ -102,48 +101,30 @@ export default {
         this.$bvModal.show("modalLogin");
       }
     },
-    auth() {
+    auth(data) {
+      login.saveUser(data);
       this.$router.push({ path: "/" });
     },
     async loginUser() {
-      var myHeaders = {
-        "Access-Control-Allow-Origin": "*",
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      };
-
-      const raw = JSON.stringify({
-        grant_type: "password",
-        client_id: 4,
-        client_secret: "sKrQEaNwbvQonv0g15ROvgRiGUYDpgJhoEBN51i8",
-        username: "gos.gabriel@gmail.com",
-        password: "qwert1234"
-      });
-
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        mode: "no-cors",
-        body: raw
-      };
-
-      // axios
-      //   .post("http://104.248.225.49/oauth/token", requestOptions)
-      //   .then(res => {
-      //     console.log(res);
-      //   })
-      //   .catch(function(error) {
-      //     console.log(error);
-      //   });
-
       try {
-        const res = await this.$http.post("/oauth/token", requestOptions)
-        if(res.ok) console.log(res);
+        const res = await axios.post("http://104.248.225.49/oauth/token", {
+          grant_type: "password",
+          client_id: process.env.VUE_APP_CLIENT_ID,
+          client_secret: process.env.VUE_APP_TOKEN_API,
+          username: this.user.username,
+          password: this.user.password,
+        });
+        var data = res;
+        this.storegeUser.email = this.user.username;
+        this.storegeUser.token = data.data.access_token;
+        this.storegeUser.authorizedUser = true;
+        // console.log(data.data);
+        this.auth(this.storegeUser);
       } catch (error) {
         console.log(error);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

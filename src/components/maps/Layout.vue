@@ -82,7 +82,7 @@
     </b-row>
     <Modal />
     <ModalRota :points="points" />
-    <ModalBus :lines="lines" />
+    <ModalBus v-if="selected" :lines="lines" />
     <ModalMap :lines="lines" />
   </b-container>
 </template>
@@ -158,8 +158,10 @@ export default {
         .get(`lines/${this.selected}/points`)
         .then(res => {
           this.table = res.data.points;
+          barramento.$emit("loadMain", false);
         })
         .catch(function(error) {
+          barramento.$emit("loadMain", false);
           console.log(error);
         });
     },
@@ -176,8 +178,10 @@ export default {
           this.selected = "";
           this.table = res.data;
           this.points = res.data;
+          barramento.$emit("loadMain", false);
         })
         .catch(function(error) {
+          barramento.$emit("loadMain", false);
           console.log(error);
         });
     },
@@ -209,7 +213,6 @@ export default {
           this.lines = res.data.sort(function(a, b) {
             return a.number - b.number;
           });
-          barramento.$emit("loadMain", false);
           this.selected ? this.pointsArray() : this.getPoints();
         })
         .catch(function(error) {
@@ -217,14 +220,15 @@ export default {
         });
     },
     openSchedule() {
-      this.$http
-        .get("schedule")
-        .then(res => {
-          barramento.$emit("mSchedule", res.data);
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
+      barramento.$emit("mSchedule", this.selected);
+      // this.$http
+      //   .get(`lines/${this.selected}/schedules`)
+      //   .then(res => {
+      //     barramento.$emit("mSchedule", res.data);
+      //   })
+      //   .catch(function(error) {
+      //     console.log(error);
+      //   });
     }
   }
 };

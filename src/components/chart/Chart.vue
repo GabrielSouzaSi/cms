@@ -10,9 +10,9 @@
       <b-col>
         <Card :cardData="totalViews"/>
       </b-col>
-      <b-col>
+      <!-- <b-col>
         <Card :cardData="totalBvOnline"/>
-      </b-col>
+      </b-col> -->
     </b-row>
     <b-row class="animation mt-5">
       <b-col>
@@ -53,12 +53,12 @@ export default {
         number: Math.floor(Math.random() * (10000 - 1000) + 1000),
         color: '#8965cd'
       },
-      totalBvOnline: {
-        name: 'Usuários BvOnline',
-        text: 'Total',
-        number: Math.floor(Math.random() * (10000 - 1000) + 1000),
-        color: '#6fdc89'
-      },
+      // totalBvOnline: {
+      //   name: 'Usuários BvOnline',
+      //   text: 'Total',
+      //   number: Math.floor(Math.random() * (10000 - 1000) + 1000),
+      //   color: '#6fdc89'
+      // },
     }
   }
 }

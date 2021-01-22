@@ -126,7 +126,7 @@
                   deselectLabel="Clique para remover"
                   :preselect-first="false"
                 >
-                  <template slot="selection" slot-scope="{ values, search, isOpen }">
+                  <template slot="selection" slot-scope="{ values, isOpen }">
                     <span
                       class="multiselect__single"
                       v-if="values.length &amp;&amp; !isOpen"
@@ -175,8 +175,8 @@ import barramento from "@/eventBus/barramento";
 export default {
   props: {
     points: {
-      type: Array
-    }
+      type: Array,
+    },
   },
   data() {
     return {
@@ -193,30 +193,30 @@ export default {
         sense: "",
         description: "",
         fileData: [],
-        points: []
+        points: [],
       },
       fields: [
         {
           key: "number",
           label: "Nº",
-          variant: "info"
+          variant: "info",
         },
         {
           key: "sense",
-          label: "Sentido"
+          label: "Sentido",
         },
         {
           key: "adress",
-          label: "Endereço"
+          label: "Endereço",
         },
         {
           key: "district",
-          label: "Bairro"
+          label: "Bairro",
         },
         {
           key: "actions",
-          label: "Ações"
-        }
+          label: "Ações",
+        },
       ],
       value: [],
       options: [
@@ -225,13 +225,13 @@ export default {
         { name: "Rails", language: "Ruby" },
         { name: "Sinatra", language: "Ruby" },
         { name: "Laravel", language: "PHP" },
-        { name: "Phoenix", language: "Elixir" }
+        { name: "Phoenix", language: "Elixir" },
       ],
-      message: ""
+      message: "",
     };
   },
   created() {
-    barramento.$on("line", line => {
+    barramento.$on("line", (line) => {
       this.cancel(line);
       $("#modalLine").modal();
     });
@@ -242,10 +242,10 @@ export default {
         this.line = line;
         let data = JSON.parse(JSON.stringify(line));
         this.add = false;
-        this.value = data.points.map(function(item) {
+        this.value = data.points.map(function (item) {
           return {
             id: item.id,
-            text: item.number + " " + item.address + " - " + item.sense
+            text: item.number + " " + item.address + " - " + item.sense,
           };
         });
         this.form.id = data.id;
@@ -254,7 +254,7 @@ export default {
         this.form.description = data.description;
         this.form.fileData = data.route;
         this.file = data.route.length + " pontos totais!";
-        console.log(this.value);
+        // console.log(this.value);
         this.getPointLine(data);
       } else {
         this.file = "Selecionar arquivo CSV!";
@@ -276,10 +276,10 @@ export default {
         .post("lines", {
           number: value.number,
           sense: value.sense,
-          description: value.description,
-          route: this.form.fileData
+          description: value.description.toUpperCase(),
+          route: this.form.fileData,
         })
-        .then(res => {
+        .then((res) => {
           this.message =
             "Linha " +
             res.data.number +
@@ -290,40 +290,47 @@ export default {
             " criado com sucesso! Esse aviso será encerrado em ";
           this.addPointLine(res.data.id);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           barramento.$emit("loadMain", false);
-          console.log(error.response);
-          alert(error.response.data.message[0].message);
+          alert(error.response.data);
         });
     },
     addPointLine(id) {
-      this.$http
-        .put(`lines/${id}/points/sync`, {
-          points: this.form.points
-        })
-        .then(res => {
-          console.log(res);
-          $("#modalLine").modal("hide");
-          barramento.$emit("loadMain", false);
-          barramento.$emit("creatPoint", this.message);
-        })
-        .catch(function(error) {
-          $("#modalLine").modal("hide");
-          barramento.$emit("loadMain", false);
-          console.log(error.response);
-          alert(error.response.data.message[0].message);
-        });
+      if (this.value.length < 1) {
+        $("#modalLine").modal("hide");
+        barramento.$emit("loadMain", false);
+        barramento.$emit("creatPoint", this.message);
+        console.log("Não tem parada!");
+      } else {
+        console.log("tem parada!");
+        this.$http
+          .put(`lines/${id}/points/sync`, {
+            points: this.form.points,
+          })
+          .then((res) => {
+            console.log(res);
+            $("#modalLine").modal("hide");
+            barramento.$emit("loadMain", false);
+            barramento.$emit("creatPoint", this.message);
+          })
+          .catch(function (error) {
+            $("#modalLine").modal("hide");
+            barramento.$emit("loadMain", false);
+            console.log(error.response);
+            alert(error.response.data.message[0].message);
+          });
+      }
     },
     delPointLine(id) {
       var delpoint = Array();
-      this.line.points.map(function(item) {
+      this.line.points.map(function (item) {
         delpoint.push(item.id);
       });
       this.$http
         .put(`lines/${this.form.id}/points/detach`, {
-          points: delpoint
+          points: delpoint,
         })
-        .then(res => {
+        .then((res) => {
           console.log(res);
           if (this.form.points.length > 0) {
             this.addPointLine(id);
@@ -332,7 +339,7 @@ export default {
             $("#modalLine").modal("hide");
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           barramento.$emit("loadMain", false);
           $("#modalLine").modal("hide");
           console.log(error.response);
@@ -355,20 +362,21 @@ export default {
           .put(`lines/${value.id}`, {
             number: value.number,
             sense: value.sense,
-            description: value.description,
-            route: this.form.fileData
+            description: value.description.toUpperCase(),
+            route: this.form.fileData,
             // points: this.form.points
           })
-          .then(res => {
-            if (this.line.points.length > 0) {
-              this.message =
+          .then((res) => {
+            console.log(res);
+            this.message =
                 "Linha " +
-                res.data.number +
+                this.form.number +
                 " - " +
-                res.data.description +
+                this.form.description +
                 " - " +
-                res.data.sense +
+                this.form.sense +
                 " editado com sucesso! Esse aviso será encerrado em ";
+            if (this.line.points.length > 0) {
               // alert("Os dados foram alterados!detach");
               this.delPointLine(value.id);
             } else {
@@ -376,7 +384,7 @@ export default {
               this.addPointLine(value.id);
             }
           })
-          .catch(function(error) {
+          .catch(function (error) {
             barramento.$emit("loadMain", false);
             console.log(error);
           });
@@ -402,7 +410,7 @@ export default {
     // A função preparar um array para receber o id dos pontos da rota
     getPointLine(line) {
       let array = [];
-      line.points.map(function(item) {
+      line.points.map(function (item) {
         array.push(item.id);
       });
       this.form.points = array;
@@ -410,7 +418,7 @@ export default {
     //Verificar se houve alteração nas paradas
     compare() {
       let arr0 = [];
-      this.value.map(function(item) {
+      this.value.map(function (item) {
         arr0.push(item.id);
       });
       if (this.form.points.length == arr0.length) {
@@ -439,14 +447,14 @@ export default {
         this.$papa.parse(file, {
           dynamicTyping: true,
           header: true,
-          complete: function(data) {
+          complete: function (data) {
             results = data.data;
-          }
+          },
         });
 
         setTimeout(() => {
           var route = Array();
-          results.map(function(item) {
+          results.map(function (item) {
             if (item.LAT && item.LONG) {
               route.push([item.LAT, item.LONG]);
             }
@@ -456,22 +464,21 @@ export default {
             file.name + " " + this.form.fileData.length + " pontos lidos!";
         }, 2000);
       }
-    }
+    },
   },
   watch: {
     points(v1) {
-      var obj = v1.map(function(item) {
+      var obj = v1.map(function (item) {
         return {
           id: item.id,
-          text: item.number + " " + item.address + " - " + item.sense
+          text: item.number + " " + item.address + " - " + item.sense,
         };
       });
       this.data = obj;
-    }
-  }
+    },
+  },
 };
 </script>
-
 <style>
 .custom-file-label::after {
   content: none !important;

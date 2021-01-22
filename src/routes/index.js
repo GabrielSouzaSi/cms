@@ -45,7 +45,8 @@ const router = new Router({
             component: Home,
             beforeEnter: guardMyroute,
             meta: {
-                requiresAuth: true
+                requiresAuth: true,
+                title: 'Home Page - Example App'
             },
             children: [
                 {

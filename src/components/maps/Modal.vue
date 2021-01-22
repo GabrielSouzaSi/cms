@@ -155,8 +155,8 @@ import barramento from "@/eventBus/barramento";
 export default {
   props: {
     data: {
-      type: Array
-    }
+      type: Array,
+    },
   },
   data() {
     return {
@@ -173,12 +173,13 @@ export default {
         district: "",
         lat: "",
         lgt: "",
-        climatizado: null
+        climatizado: null,
       }
     };
   },
   created() {
     var district = [
+      "Não Informado",
       "05 De Outubro",
       "13 De Setembro",
       "31 De Março",
@@ -199,11 +200,11 @@ export default {
       "Centro",
       "Cidade Satélite",
       "Cinturão Verde",
-      "Doutor Airton Rocha",
-      "Doutor Silvio Botelho",
-      "Doutor Silvio Leite",
-      "Estados",
-      "Governador Aquilino Mota Duarte",
+      "Dr. Airton Rocha",
+      "Dr. Silvio Botelho",
+      "Dr. Silvio Leite",
+      "Dos Estados",
+      "Gov. Aquilino Mota Duarte",
       "Jardim Caranã",
       "Jardim Equatorial",
       "Jardim Floresta",
@@ -223,7 +224,7 @@ export default {
       "Pintolândia",
       "Piscicultura",
       "Pricumã",
-      "Professora Araceli Souto Maior",
+      "Profa. Araceli Souto Maior",
       "Raiar Do Sol",
       "Said Salomão",
       "Santa Luzia",
@@ -234,17 +235,15 @@ export default {
       "São Pedro",
       "São Vicente",
       "Tancredo Neves",
-      "União"
+      "União",
     ];
     this.selectDistrict = district;
-    barramento.$on("point", point => {
-      
+    barramento.$on("point", (point) => {
       // var data = Object.values(point)
-      console.log(point);
-      
-      
+      // console.log(point);
+
       if (point) {
-        this.add = false
+        this.add = false;
         this.point = point;
         this.form.id = point.id;
         this.form.number = point.number;
@@ -254,8 +253,8 @@ export default {
         this.form.lat = point.lat;
         this.form.lgt = point.lgt;
         this.form.climatizado = point["air-conditioning"];
-      } else {        
-        this.add = true
+      } else {
+        this.add = true;
         this.form.id = null;
         this.form.number = null;
         this.form.sense = "";
@@ -279,48 +278,61 @@ export default {
         value.lgt == this.point.lgt &&
         value.address == this.point["air-conditioning"]
       ) {
-        $("#editPoint").modal('hide')
-        barramento.$emit("alert", 'Os dados não foram alterados! Esse aviso será encerrado em ')
-      }else {
+        $("#editPoint").modal("hide");
+        barramento.$emit(
+          "alert",
+          "Os dados não foram alterados! Esse aviso será encerrado em "
+        );
+      } else {
         this.$http
-      .put(`points/${value.id}`, {
-        number: value.number,
-        sense: value.sense,
-        address: value.address,
-        district: value.district,
-        lat: value.lat,
-        lgt: value.lgt,
-        'air-conditioning': Boolean(value.climatizado)
-      })
-      .then(res => {
-        console.log(res.data);
-        $("#editPoint").modal('hide')
-        barramento.$emit("edited", 'Parada '+ value.number + ' editado com sucesso! Esse aviso será encerrado em ')
-      })
-      .catch(function(error) {
-        console.log(error)
-      })
+          .put(`points/${value.id}`, {
+            number: value.number,
+            sense: value.sense,
+            address: value.address,
+            district: value.district,
+            lat: value.lat,
+            lgt: value.lgt,
+            "air-conditioning": Boolean(value.climatizado),
+          })
+          .then((res) => {
+            console.log(res.data);
+            $("#editPoint").modal("hide");
+            barramento.$emit(
+              "edited",
+              "Parada " +
+                value.number +
+                " editado com sucesso! Esse aviso será encerrado em "
+            );
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
       }
     },
-    addPoint(value) { 
+    addPoint(value) {
       console.log(value);
       this.$http
         .post("points", {
-        number: value.number,
-        sense: value.sense,
-        address: value.address,
-        district: value.district,
-        lat: value.lat,
-        lgt: value.lgt,
-        "air-conditioning": Boolean(value.climatizado),
+          number: value.number,
+          sense: value.sense,
+          address: value.address,
+          district: value.district,
+          lat: value.lat,
+          lgt: value.lgt,
+          "air-conditioning": Boolean(value.climatizado),
         })
-        .then(res => {
-           $("#editPoint").modal('hide')
-           barramento.$emit("creatPoint", 'Parada Nº'+ res.data.number + ' criado com sucesso! Esse aviso será encerrado em ')
+        .then((res) => {
+          $("#editPoint").modal("hide");
+          barramento.$emit(
+            "creatPoint",
+            "Parada Nº" +
+              res.data.number +
+              " criado com sucesso! Esse aviso será encerrado em "
+          );
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error.response);
-          alert(error.response.data.message[0].message)
+          alert(error.response.data.message[0].message);
         });
     }
   }

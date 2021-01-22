@@ -4,7 +4,7 @@
       <!-- Sidebar  -->
       <nav id="sidebar">
         <div class="sidebar-header">
-          <img src="../assets/image.svg" class="mx-auto d-block" width="200" height="145" />
+          <img src="../assets/Brasao_Boa_Vista.png" class="mx-auto d-block" width="200" height="145" />
           <!-- <img src="http://placehold.it/200x145?text=Logo" class="mx-auto d-block" /> -->
         </div>
 
@@ -116,6 +116,7 @@ export default {
         $('[data-toggle="tooltip"]').tooltip();
       });
     });
+     document.title = "CMS";
   },
   methods: {
     logout() {

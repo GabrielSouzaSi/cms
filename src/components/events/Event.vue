@@ -9,14 +9,31 @@
 </template>
 
 <script>
+import barramento from "@/eventBus/barramento";
 import Table from "./Table";
 export default {
   components: {
-    Table
+    Table,
   },
   data() {
     return {};
-  }
+  },
+  created() {
+    barramento.$emit("loadMain", true);
+    this.upEvents();
+  },
+  methods: {
+    async upEvents() {
+      try {
+        const res = await this.$http.get("events");
+        console.log(res.data);
+        barramento.$emit("loadMain", false);
+      } catch (error) {
+        console.log(error);
+        barramento.$emit("loadMain", false);
+      }
+    },
+  },
 };
 </script>
 
