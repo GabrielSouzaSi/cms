@@ -53,7 +53,7 @@ const router = new Router({
                     path: '',
                     beforeEnter: guardMyroute,
                     components: {
-                        cms: Event
+                        cms: Chart
                     }
                 },
                 {
@@ -78,10 +78,10 @@ const router = new Router({
                     }
                 },
                 {
-                    path: 'charts',
+                    path: 'events',
                     beforeEnter: guardMyroute,
                     components: {
-                        cms: Chart
+                        cms: Event
                     }
                 }
             ]

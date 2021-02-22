@@ -4,18 +4,23 @@
       <!-- Sidebar  -->
       <nav id="sidebar">
         <div class="sidebar-header">
-          <img src="../assets/Brasao_Boa_Vista.png" class="mx-auto d-block" width="200" height="145" />
+          <img src="../assets/Brasao_Boa_Vista1.png" class="mx-auto d-block" width="200" height="145" />
           <!-- <img src="http://placehold.it/200x145?text=Logo" class="mx-auto d-block" /> -->
         </div>
 
         <ul class="list-unstyled components">
           <li>
-            <router-link to="/" active-class="menuActive" exact>
+            <router-link hidden to="/" active-class="menuActive" exact>
               <b-icon-columns-gap style="width: 25px; height: 25px;" class="align-middle mr-3"></b-icon-columns-gap>Dashboard
             </router-link>
           </li>
           <li>
-            <router-link to="/users" active-class="menuActive">
+            <router-link to="/events" active-class="menuActive">
+              <b-icon-calendar4-event style="width: 25px; height: 25px;" class="align-middle mr-3"></b-icon-calendar4-event>Eventos
+            </router-link>
+          </li>
+          <li>
+            <router-link hidden to="/users" active-class="menuActive">
               <b-icon-person style="width: 25px; height: 25px;" class="align-middle mr-3"></b-icon-person>Usuários
             </router-link>
           </li>
@@ -30,12 +35,7 @@
             </router-link>
           </li>
           <li>
-            <router-link to="/charts" active-class="menuActive">
-              <b-icon-pie-chart style="width: 25px; height: 25px;" class="align-middle mr-3"></b-icon-pie-chart>Estatísticas
-            </router-link>
-          </li>
-          <li>
-            <router-link to="/suporte" active-class="menuActive">
+            <router-link hidden to="/suporte" active-class="menuActive">
               <b-icon-question-circle style="width: 25px; height: 25px;" class="align-middle mr-3"></b-icon-question-circle>Suporte
             </router-link>
           </li>
@@ -60,7 +60,7 @@
 
               <div class="dropdrown">
                 <a class="pr-3" data-toggle="dropdown" href="#">
-                  <b-icon-people-circle style="width: 25px; height: 25px;"></b-icon-people-circle>
+                  <b-icon-person-circle style="width: 25px; height: 25px;"></b-icon-person-circle>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right mr-3">
                   <div class="dropdown-item text-center">

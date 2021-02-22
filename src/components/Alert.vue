@@ -1,4 +1,5 @@
 <template>
+<div>
   <b-alert
     v-show="show"
     :show="dismissCountDown"
@@ -6,13 +7,14 @@
     fade
     variant="success"
     @dismiss-count-down="countDownChanged"
-  >{{alertData}} Esse aviso será encerrado em {{ dismissCountDown }} segundos...</b-alert>
+  >{{alertMessage}} {{ dismissCountDown }} segundos</b-alert>
+</div>
 </template>
 
 <script>
 export default {
   props: {
-    alertData: {
+    alertMessage: {
       type: String
     }
   },
@@ -34,7 +36,7 @@ export default {
     }
   },
   watch: {
-    alertData(v1) {
+    alertMessage(v1) {
       v1 ? this.showAlert() : (this.show = false);
     }
   }

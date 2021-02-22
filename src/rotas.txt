@@ -14,11 +14,21 @@
 POST         http://104.248.225.49/api/auth/register
 POST         http://104.248.225.49/oauth/token
 
-http://104.248.225.49/api/roles
-http://104.248.225.49/api/permissions
+            ## ACL ROLES
+
+GET          http://104.248.225.49/api/roles
+POST         http://104.248.225.49/api/roles
+DELETE       http://104.248.225.49/api/roles/{role}
+PUT          http://104.248.225.49/api/roles/{role}
+
+            ## ACL PERMISSSIONS
+
+GET          http://104.248.225.49/api/permissions
+POST         http://104.248.225.49/api/permissions
+DELETE       http://104.248.225.49/api/permissions/{permission}
+PUT          http://104.248.225.49/api/permissions/{permissions}
 
 normando, essa rota ta certo?
-
 
             ## CATEGORIES
 

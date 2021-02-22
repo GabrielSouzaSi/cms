@@ -1,380 +1,489 @@
 <template>
-  <!-- The Modal -->
-  <div id="event" class="modal">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Evento</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <!-- Modal body -->
-        <div class="modal-body">
-          <form action>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="event"></label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="event"
-                    placeholder="Nome do Evento"
-                    name="event"
-                    v-model.trim="form.name"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="description"></label>
-                  <b-form-textarea
-                    id="description"
-                    v-model.trim="form.description"
-                    placeholder="Descrição..."
-                    rows="2"
-                    max-rows="3"
-                  ></b-form-textarea>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="img"></label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="img"
-                    placeholder="Imagem"
-                    name="img"
-                    v-model.trim="form.img"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="local"></label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="local"
-                    placeholder="Nome Do Local"
-                    name="local"
-                    v-model.trim="form.local"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label for="adress"></label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="adress"
-                    placeholder="Endereço"
-                    name="adress"
-                    v-model.trim="form.adress"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="date">Data Do Evento</label>
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="date"
-                    placeholder="Data Do Evento"
-                    name="date"
-                    v-model="form.date"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label for="startTime">Horário Início</label>
-                  <input
-                    type="time"
-                    min="00:00"
-                    max="24:00"
-                    class="form-control"
-                    id="startTime"
-                    name="startTime"
-                    v-model="form.startTime"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label for="endTime">Horério Final</label>
-                  <input
-                    type="time"
-                    class="form-control"
-                    id="endTime"
-                    name="endTime"
-                    v-model="form.endTime"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="dropdown">
-                  <button
-                    id="category"
-                    type="button"
-                    v-bind:style="{background:form.category[0].color}"
-                    class="btn btn-block text-white dropdown-toggle"
-                    data-toggle="dropdown"
-                  >Categoria {{form.category[0].name}}</button>
-                  <div class="dropdown-menu w-100">
-                    <a
-                      class="dropdown-item"
-                      v-for="(value, index) in category"
-                      :key="index"
-                      @click="getCategory(value)"
-                    >
-                      {{value.name}}
-                      <b-icon
-                        icon="square"
-                        font-scale="1.5"
-                        v-bind:style="{background :value.color, color:value.color}"
-                      ></b-icon>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
+  <div>
+    <b-modal
+      id="modalEvent"
+      size="xl"
+      title="Evento"
+      hide-footer
+      no-close-on-backdrop
+    >
+      <b-container>
+        <b-form @submit.stop.prevent="onSubmit">
+          <b-row>
+            <b-col>
+              <b-form-group id="field1" label="Nome" label-for="EditFormEvent1">
+                <b-form-input
+                  id="EditFormEvent1"
+                  name="EditFormEvent1"
+                  v-model="$v.form.name.$model"
+                  :state="validateState('name')"
+                  aria-describedby="EditFormEvent-i1"
+                ></b-form-input>
 
-        <!-- Modal footer -->
-        <div class="modal-footer">
-          <div class="col">
-            <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">Cancelar</button>
-          </div>
-          <div class="col">
-            <button
-              v-if="add"
-              type="button"
-              class="btn btn-success btn-block"
-              @click="addEvent(form)"
-            >Salvar</button>
-            <button
-              v-else
-              type="button"
-              class="btn btn-success btn-block"
-              @click="upEvent(form)"
-            >Salvar</button>
-          </div>
-        </div>
-      </div>
-    </div>
+                <b-form-invalid-feedback id="EditFormEvent-i1"
+                  >Nome do Evento obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
+
+              <b-form-group
+                id="field2"
+                label="Descrição"
+                label-for="EditFormEvent2"
+              >
+                <b-form-input
+                  id="EditFormEvent2"
+                  name="EditFormEvent2"
+                  v-model="$v.form.description.$model"
+                  :state="validateState('description')"
+                  aria-describedby="EditFormEvent-i2"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="EditFormEvent-i2"
+                  >Descrição do Evento obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
+
+              <!-- <div v-if="form.img_file" v-html="img"></div> -->
+              <!-- <img :src="form.img_file" class="rounded" width="300" height="250" /> -->
+
+              <div class="mt-3">
+                <b-button
+                  v-if="!form.img_file"
+                  @click="upFile()"
+                  variant="success"
+                  >Adicionar Imagem</b-button
+                >
+                <b-button v-else @click="upFile()" variant="success"
+                  >Atualizar Imagem</b-button
+                >
+              </div>
+
+              <b-input-group class="mb-3">
+                <b-form-file
+                  hidden
+                  accept="image/*"
+                  id="field3"
+                  class="mt-2"
+                  plain
+                  @change="image"
+                  v-model="$v.form.img_file.$model"
+                  :state="validateState('img_file')"
+                  aria-describedby="EditFormEvent-i3"
+                ></b-form-file>
+                <b-form-invalid-feedback id="EditFormEvent-i3"
+                  >Imagem do Evento obrigatório.</b-form-invalid-feedback
+                >
+              </b-input-group>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="field4"
+                label="Local"
+                label-for="EditFormEvent4"
+              >
+                <b-form-input
+                  id="EditFormEvent4"
+                  name="EditFormEvent4"
+                  v-model="$v.form.place.$model"
+                  :state="validateState('place')"
+                  aria-describedby="EditFormEvent-i4"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="EditFormEvent-i4"
+                  >Local do Evento obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+
+            <b-col>
+              <b-form-group
+                id="field5"
+                label="Endereço"
+                label-for="EditFormEvent5"
+              >
+                <b-form-input
+                  id="EditFormEvent5"
+                  name="EditFormEvent5"
+                  v-model="$v.form.address.$model"
+                  :state="validateState('address')"
+                  aria-describedby="EditFormEvent-i5"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="EditFormEvent-i5"
+                  >Endereço do Evento obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="field6"
+                label="Data do Evento"
+                label-for="EditFormEvent6"
+              >
+                <b-form-input
+                  id="EditFormEvent6"
+                  name="EditFormEvent6"
+                  type="date"
+                  v-model="$v.form.date.$model"
+                  :state="validateState('date')"
+                  aria-describedby="EditFormEvent-i6"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="EditFormEvent-i6"
+                  >Data do Evento obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+
+            <b-col>
+              <b-form-group
+                id="field7"
+                label="Horário Início"
+                label-for="EditFormEvent7"
+              >
+                <b-form-input
+                  id="EditFormEvent7"
+                  name="EditFormEvent7"
+                  type="time"
+                  v-model="$v.form.starts_at.$model"
+                  :state="validateState('starts_at')"
+                  aria-describedby="EditFormEvent-i7"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="EditFormEvent-i7"
+                  >Horário de início do Evento
+                  obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+
+            <b-col>
+              <b-form-group
+                id="field8"
+                label="Horário Final"
+                label-for="EditFormEvent8"
+              >
+                <b-form-input
+                  id="EditFormEvent8"
+                  name="EditFormEvent8"
+                  type="time"
+                  v-model="$v.form.ends_at.$model"
+                  :state="validateState('ends_at')"
+                  aria-describedby="EditFormEvent-i8"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="EditFormEvent-i8"
+                  >Horário final do Evento obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="field9"
+                label="Categoria"
+                label-for="EditFormEvent9"
+              >
+                <b-form-select
+                  v-model="$v.form.category_id.$model"
+                  :options="category"
+                  id="EditFormEvent9"
+                  value-field="id"
+                  text-field="name"
+                  :state="validateState('category_id')"
+                  aria-describedby="EditFormEvent-i9"
+                  disabled-field="notEnabled"
+                  @change="formSelect"
+                ></b-form-select>
+              </b-form-group>
+              <b-badge
+                v-if="form.category_id"
+                v-bind:style="{
+                  background: badge.color,
+                  color: 'white',
+                }"
+              >
+                <b-icon icon="tag-fill"></b-icon>
+                {{ badge.name }}
+              </b-badge>
+              <b-form-invalid-feedback id="EditFormEvent-i9">
+                Categoria do Evento obrigatório.
+              </b-form-invalid-feedback>
+            </b-col>
+          </b-row>
+
+          <b-row align-h="between" class="text-center mt-3">
+            <b-col cols="6">
+              <b-button b-button block variant="danger" @click="resetForm()"
+                >Cancelar</b-button
+              >
+            </b-col>
+            <b-col cols="6">
+              <b-button v-if="!form.id" type="submit" block variant="success"
+                >Salvar</b-button
+              >
+              <b-button
+                v-else
+                type="button"
+                @click="upEvent()"
+                block
+                variant="success"
+                >Atualizar</b-button
+              >
+            </b-col>
+          </b-row>
+        </b-form>
+      </b-container>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import $ from "jquery";
+import { validationMixin } from "vuelidate";
+import { required } from "vuelidate/lib/validators";
 import barramento from "@/eventBus/barramento";
+
 export default {
+  mixins: [validationMixin],
   props: {
-    data: {
-      type: Array
-    }
+    category: Array,
   },
   data() {
     return {
-      add: null,
-      items: [],
+      badge: {
+        name: null,
+        color: null,
+      },
+      img: null,
       form: {
         id: null,
-        name: "",
-        description: "",
-        img: "",
-        local: "",
-        adress: "",
-        date: "",
-        startTime: "",
-        endTime: "",
-        category: [
-          {
-            id: null,
-            name: "",
-            description: "",
-            color: ""
-          }
-        ]
+        name: null,
+        description: null,
+        img_file: null,
+        place: null,
+        address: null,
+        date: null,
+        starts_at: null,
+        ends_at: null,
+        category_id: null,
       },
-      category: [
-        {
-          id: 1,
-          name: "Cultura",
-          description: "Descrição",
-          color: "#00a3c0"
-        },
-        {
-          id: 2,
-          name: "Social",
-          description: "Descrição",
-          color: "#febd11"
-        },
-        {
-          id: 3,
-          name: "Saúde",
-          description: "Descrição",
-          color: "#6ab051"
-        }
-      ]
+      urlImg: null,
+      data: null,
     };
   },
+  validations: {
+    form: {
+      description: {
+        required,
+      },
+      name: {
+        required,
+      },
+      category_id: {
+        required,
+      },
+      img_file: {
+        required,
+      },
+      place: {
+        required,
+      },
+      address: {
+        required,
+      },
+      date: {
+        required,
+      },
+      starts_at: {
+        required,
+      },
+      ends_at: {
+        required,
+      },
+    },
+    data: [],
+  },
   created() {
-    barramento.$on("mEvent", data => {
-      // console.log(data);
-      if (data) {
-        let event = JSON.parse(JSON.stringify(data));
-        this.items = event;
-        this.showEvent(data);
-        $("#event").modal();
-      } else {
-        this.showEvent(data);
-        $("#event").modal();
-      }
+    barramento.$on("modalFormEvent", (data) => {
+      this.data = data;
+      data ? this.editEvent(data) : this.$bvModal.show("modalEvent");
     });
   },
   methods: {
-    getCategory(data) {      
-      $("#category").removeClass("bg-secondary");
-      let arr = [];
-      arr.push(data)
-      this.form.category = arr;
+    upFile() {
+      document.getElementById("field3").click();
     },
-    showEvent(value) {
-      if (value) {
-        if(!(value.category[0].id))$("#category").removeClass("bg-secondary");
-        this.add = false;
-        this.form = value;
-      } else {
-        document.querySelector("#category").classList.add("bg-secondary");
-        this.add = true;
-        this.form.id = Math.floor(Math.random() * 100);
-        this.form.name = "Ação Cultural ";
-        this.form.description =
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
-        this.form.img = "/img/Teatro%20Municipal.jpg";
-        this.form.local = "Teatro Municipal";
-        this.form.adress =
-          "Av. Glaycon de Paiva - São Vicente, Boa Vista - RR, 69304-360";
-        this.form.date = "2020-05-18";
-        this.form.startTime = "18:00";
-        this.form.endTime = "20:00";
-        // this.form.category[0].id = this.form.category[0].id;
-        // this.form.category[0].name = this.form.category[0].name;
-        // this.form.category[0].description = this.form.category[0].description;
-        // this.form.category[0].color = this.form.category[0].color;
+    formSelect(event) {
+      var badge = this.category.find((item) => item.id == event);
+      this.badge.name = badge.name;
+      this.badge.color = badge.color;
+    },
+    image(event) {
+      this.form.img_file = event.target.files[0];
+      // console.log(event.target.files[0]);
+      this.urlImg = URL.createObjectURL(event.target.files[0]);
+      this.img =
+        "<img src='" +
+        this.urlImg +
+        "' class='rounded' width='300' height='250' />";
+    },
+    editEvent(data) {
+      // let img = data.img.split('/', 5)
+      // this.img = "<img src='" + process.env.VUE_APP_URL + data.img + "' class='rounded' width='300' height='250' id='image' value='"+ img[4] +"' />";
+      this.form.id = data.id;
+      this.form.name = data.name;
+      this.form.description = data.description;
+      // let url = process.env.VUE_APP_URL + data.img;
+      // this.form.img_file = img[4];
+      this.form.img_file = data.img;
+      this.form.place = data.place;
+      this.form.address = data.address;
+      this.form.date = data.date;
+      this.form.starts_at = data.starts_at;
+      this.form.ends_at = data.ends_at;
+      this.form.category_id = data.category.id;
+      this.formSelect(data.category_id);
+      this.$bvModal.show("modalEvent");
+    },
+    validateState(name) {
+      const { $dirty, $error } = this.$v.form[name];
+      return $dirty ? !$error : null;
+    },
+    resetForm() {
+      this.form = {
+        id: null,
+        name: null,
+        description: null,
+        img_file: null,
+        place: null,
+        address: null,
+        date: null,
+        starts_at: null,
+        ends_at: null,
+        category_id: null,
+      };
+
+      this.$nextTick(() => {
+        this.$v.$reset();
+        this.$bvModal.hide("modalEvent");
+      });
+    },
+    onSubmit() {
+      this.$v.form.$touch();
+      if (!this.$v.form.$anyError) {
+        this.$bvModal.hide("modalEvent");
+        barramento.$emit("loadMain", true);
+        const formData = new FormData();
+        formData.append("img_file", this.form.img_file);
+        formData.append("name", this.form.name);
+        formData.append("description", this.form.description);
+        formData.append("place", this.form.place);
+        formData.append("date", this.form.date);
+        formData.append("address", this.form.address);
+        formData.append("starts_at", this.form.starts_at.slice(0, 5));
+        formData.append("ends_at", this.form.ends_at.slice(0, 5));
+        formData.append("category_id", this.form.category_id);
+        const config = {
+          headers: {
+            "content-type": "multipart/form-data",
+            Accept: "application/json",
+          },
+        };
+        this.$http
+          .post("events", formData, config)
+          .then((res) => {
+            barramento.$emit("loadMain", false);
+            barramento.$emit(
+              "createEvent",
+              "Evento " +
+                this.form.name +
+                " Evento criado com sucesso! Esse aviso será encerrado em "
+            );
+            console.log(res.data);
+          })
+          .catch(function (error) {
+            barramento.$emit("loadMain", false);
+            console.log(error);
+            // console.log(error.response);
+            // alert(error.response.data.message[0].message);
+          });
       }
     },
-    upEvent(value) {
-      console.log(value, this.items);
-      
+    upEvent() {
+      // verifica se houve alguma alteração
       if (
-        this.items.id == value.id &&
-        this.items.name == value.name &&
-        this.items.description == value.description &&
-        this.items.img == value.img &&
-        this.items.local == value.local &&
-        this.items.adress == value.adress &&
-        this.items.date == value.date &&
-        this.items.startTime == value.startTime &&
-        this.items.endTime == value.endTime &&
-        this.items.category[0].id == value.category[0].id
+        this.form.id == this.data.id &&
+        this.form.name == this.data.name &&
+        this.form.description == this.data.description &&
+        this.form.category_id == this.data.category.id &&
+        this.form.img_file == process.env.VUE_APP_URL + this.data.img &&
+        this.form.place == this.data.place &&
+        this.form.address == this.data.address &&
+        this.form.date == this.data.date &&
+        this.form.starts_at == this.data.start &&
+        this.form.ends_at == this.data.end
       ) {
-        $("#event").modal("hide");
-        barramento.$emit(
-          "alertEvent",
-          "Os dados não foram alterados! Esse aviso será encerrado em "
-        );
+        this.resetForm();
       } else {
-        let data = this.data.map(item =>
-          item.id == value.id
-            ? {
-                ...item,
-                id: value.id,
-                name: value.name,
-                description: value.description,
-                img: value.img,
-                local: value.local,
-                adress: value.adress,
-                date: value.date,
-                startTime: value.startTime,
-                endTime: value.endTime,
-                category: value.category
-              }
-            : item
-        );        
-        barramento.$emit("upTableEvent", data);
-        $("#event").modal("hide");
-        // this.$http
-        //   .put(`event/${value.id}`, {
-        //     name: value.name,
-        //     description: value.description,
-        //     color: value.color
-        //   })
-        //   .then(res => {
-        //     console.log(res.data);
-        //     $("#editPoint").modal("hide");
-        //     barramento.$emit(
-        //       "edited",
-        //       "Parada " +
-        //         value.number +
-        //         " editado com sucesso! Esse aviso será encerrado em "
-        //     );
-        //   })
-        //   .catch(function(error) {
-        //     console.log(error);
-        //   });
+        this.$v.form.$touch();
+        if (!this.$v.form.$anyError) {
+          this.$bvModal.hide("modalEvent");
+          barramento.$emit("loadMain", true);
+
+          // const params  = new URLSearchParams();
+          const params = new FormData();
+          params.append("img_file", this.form.img_file);
+          params.append("name", this.form.name);
+          params.append("description", this.form.description);
+          params.append("place", this.form.place);
+          params.append("date", this.form.date);
+          params.append("address", this.form.address);
+          params.append("starts_at", "10:00");
+          params.append("ends_at", "11:00");
+          params.append("category_id", this.form.category_id);
+          const config = {
+            headers: {
+              "Content-type": "x-www-form-urlencoded;charset=UTF-8",
+              Accept: "application/json",
+            },
+          };
+          this.$http
+            .post(`events/${this.form.id}?_method=PUT`, params, config)
+            .then((res) => {
+              barramento.$emit("loadMain", false);
+              barramento.$emit(
+                "createEvent",
+                "Evento " +
+                  this.form.name +
+                  " editado com sucesso! Esse aviso será encerrado em "
+              );
+              console.log(res.data);
+            })
+            .catch(function (error) {
+              barramento.$emit("loadMain", false);
+              console.log(error);
+              console.log(error.response);
+              // console.log(error.response);
+              // alert(error.response.data.message[0].message);
+            });
+        }
+        this.resetForm();
       }
     },
-    addEvent(value) {
-      $("#event").modal("hide");
-      let data = [...this.data, value];
-      barramento.$emit("createTable", data);
-      // this.$http
-      //   .post("category", {
-      //     name: value.name,
-      //     description: value.description,
-      //     color: value.color
-      //   })
-      //   .then(res => {
-      //     $("#category").modal("hide");
-      // barramento.$emit(
-      //   "alertCategory",
-      //   "Parada Nº" +
-      //     res.data.number +
-      //     " criado com sucesso! Esse aviso será encerrado em "
-      // );
-      //   })
-      //   .catch(function(error) {
-      //     console.log(error.response);
-      //     alert(error.response.data.message[0].message);
-      //   });
-    }
-  }
+  },
 };
 </script>
 
 <style>
+.custom-file-input:lang(en) ~ .custom-file-label::after {
+  content: inherit;
+}
 </style>

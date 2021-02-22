@@ -1,226 +1,219 @@
 <template>
-  <!-- The Modal -->
-  <div id="category" class="modal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Categoria</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
+  <div>
+    <b-modal id="modal-1" title="Categoria" hide-footer>
+      <b-container>
+        <b-form @submit.stop.prevent="onSubmit">
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="example-input-group-1"
+                label="Nome"
+                label-for="example-input-1"
+              >
+                <b-form-input
+                  id="example-input-1"
+                  name="example-input-1"
+                  v-model="$v.form.name.$model"
+                  :state="validateState('name')"
+                  aria-describedby="input-1-live-feedback"
+                ></b-form-input>
 
-        <!-- Modal body -->
-        <div class="modal-body">
-          <form action>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="category"></label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="category"
-                    placeholder="Nome"
-                    name="category"
-                    v-model.number="form.name"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="description"></label>
-                  <b-form-textarea
-                    id="description"
-                    v-model="form.description"
-                    placeholder="Descrição..."
-                    rows="2"
-                    max-rows="3"
-                  ></b-form-textarea>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="dropdown mt-3 pb-3">
-                  <button
-                    id="color"
-                    type="button"
-                    v-bind:style="{background:form.color}"
-                    class="btn btn-block text-white dropdown-toggle"
-                    data-toggle="dropdown"
-                  >Selecionar Cor</button>
-                  <div class="dropdown-menu w-100">
-                    <a
-                      class="dropdown-item"
-                      v-for="(value, index) in color"
-                      :key="index"
-                      @click="getColor(value.color)"
-                    >
-                      {{value.color}}
-                      <b-icon
-                        icon="square"
-                        font-scale="1.5"
-                        v-bind:style="{background :value.color, color:value.color}"
-                      ></b-icon>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
+                <b-form-invalid-feedback id="input-1-live-feedback"
+                  >Nome da categoria obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
 
-        <!-- Modal footer -->
-        <div class="modal-footer">
-          <div class="col">
-            <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">Cancelar</button>
-          </div>
-          <div class="col">
-            <button
-              v-if="add"
-              type="button"
-              class="btn btn-success btn-block"
-              @click="addCategory(form)"
-            >Salvar</button>
-            <button
-              v-else
-              type="button"
-              class="btn btn-success btn-block"
-              @click="upCategory(form)"
-            >Salvar</button>
-          </div>
-        </div>
-      </div>
-    </div>
+              <b-form-group
+                id="example-input-group-2"
+                label="Description"
+                label-for="example-input-2"
+              >
+                <b-form-input
+                  id="example-input-2"
+                  name="example-input-2"
+                  v-model="$v.form.description.$model"
+                  :state="validateState('description')"
+                  aria-describedby="input-2-live-feedback"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="input-2-live-feedback"
+                  >Descrição da categoria obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
+              <b-form-group
+                id="example-input-group-3"
+                label="Color"
+                label-for="example-input-3"
+              >
+                <b-form-input
+                  id="example-input-3"
+                  name="example-input-3"
+                  type="color"
+                  v-model="$v.form.color.$model"
+                  :state="validateState('color')"
+                  aria-describedby="input-3-live-feedback"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="input-3-live-feedback"
+                  >Cor da categoria obrigatório.</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row align-h="between" class="text-center mt-3">
+            <b-col cols="6">
+              <b-button b-button block variant="danger" @click="resetForm()"
+                >Cancelar</b-button
+              >
+            </b-col>
+            <b-col cols="6">
+              <b-button v-if="!form.id" type="submit" block variant="success"
+                >Salvar</b-button
+              >
+              <b-button
+                v-else
+                type="button"
+                @click="upCategory()"
+                block
+                variant="success"
+                >Atualizar</b-button
+              >
+            </b-col>
+          </b-row>
+        </b-form>
+      </b-container>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import $ from "jquery";
+import { validationMixin } from "vuelidate";
+import { required } from "vuelidate/lib/validators";
 import barramento from "@/eventBus/barramento";
+
 export default {
-  props: {
-    data: {
-      type: Array
-    }
-  },
+  mixins: [validationMixin],
   data() {
     return {
-      add: null,
-      items: [],
       form: {
         id: null,
-        name: "",
-        description: "",
-        color: ""
+        name: null,
+        description: null,
+        color: null,
       },
-      color: [
-        { color: "#009f57" },
-        { color: "#00a3c0" },
-        { color: "#febd11" },
-        { color: "#00a3bf" }
-      ]
     };
   },
+  validations: {
+    form: {
+      description: {
+        required,
+      },
+      name: {
+        required,
+      },
+      color: {
+        required,
+      },
+    },
+    data: [],
+  },
   created() {
-    barramento.$on("mCategory", data => {
-      this.items = JSON.parse(JSON.stringify(data));
-      this.showCategory(data);
-      $("#category").modal();
+    barramento.$on("mCategory", (data) => {
+      this.data = data;
+      data ? (this.form = JSON.parse(JSON.stringify(data))) : this.resetForm();
+      this.$bvModal.show("modal-1");
     });
   },
   methods: {
-    getColor(color) {
-      $("#color").removeClass("bg-secondary");
-      this.form.color = color;
+    validateState(name) {
+      const { $dirty, $error } = this.$v.form[name];
+      return $dirty ? !$error : null;
     },
-    showCategory(data) {
-      if (data) {
-        $("#color").removeClass("bg-secondary");
-        this.add = false;
-        this.form = data;
-      } else {
-        document.querySelector("#color").classList.add("bg-secondary");
-        this.add = true;
-        this.form.id = Math.floor(Math.random() * 100);
-        this.form.name = "";
-        this.form.description = "Lorem Ipsum is simply dummy text";
-        this.form.color = "";
+    resetForm() {
+      this.form = {
+        id: null,
+        name: null,
+        description: null,
+        color: null,
+      };
+
+      this.$nextTick(() => {
+        this.$v.$reset();
+        this.$bvModal.hide("modal-1");
+      });
+    },
+    onSubmit() {
+      this.$v.form.$touch();
+      if (!this.$v.form.$anyError) {
+        this.$bvModal.hide("modal-1");
+        barramento.$emit("loadMain", true);
+        this.$http
+          .post("categories", {
+            name: this.form.name,
+            description: this.form.description,
+            color: this.form.color,
+          })
+          .then((res) => {
+            console.log(res.data);
+            barramento.$emit("loadMain", false);
+            barramento.$emit(
+              "upData",
+              "Categoria " +
+                this.form.name +
+                " adicionado com sucesso! Esse aviso será encerrado em "
+            );
+          })
+          .catch(function (error) {
+            barramento.$emit("loadMain", false);
+            console.log(error);
+            // console.log(error.response);
+            // alert(error.response.data.message[0].message);
+          });
       }
     },
-    upCategory(value) {
+    upCategory() {
+      this.$bvModal.hide("modal-1");
+      barramento.$emit("loadMain", true);
+      // verifica se houve alguma alteração
       if (
-        value.name == this.items.name &&
-        value.description == this.items.description &&
-        value.color == this.items.color
+        this.form.id == this.data.id &&
+        this.form.name == this.data.name &&
+        this.form.description == this.data.description &&
+        this.form.color == this.data.color
       ) {
-        $("#category").modal("hide");
+        this.resetForm();
+        barramento.$emit("loadMain", false);
         barramento.$emit(
           "alertCategory",
           "Os dados não foram alterados! Esse aviso será encerrado em "
         );
       } else {
-        let data = this.data.map(item =>
-          item.id == value.id
-            ? {
-                ...item,
-                name: value.name,
-                description: value.description,
-                color: value.color
-              }
-            : item
-        );
-        barramento.$emit("upTable", data);
-        $("#category").modal("hide");
-        // this.$http
-        //   .put(`category/${value.id}`, {
-        //     name: value.name,
-        //     description: value.description,
-        //     color: value.color
-        //   })
-        //   .then(res => {
-        //     console.log(res.data);
-        //     $("#editPoint").modal("hide");
-        //     barramento.$emit(
-        //       "edited",
-        //       "Parada " +
-        //         value.number +
-        //         " editado com sucesso! Esse aviso será encerrado em "
-        //     );
-        //   })
-        //   .catch(function(error) {
-        //     console.log(error);
-        //   });
+        this.$http
+          .put(`categories/${this.form.id}`, {
+            name: this.form.name,
+            description: this.form.description,
+            color: this.form.color,
+          })
+          .then((res) => {
+            console.log(res.data);
+            barramento.$emit("loadMain", false);
+            barramento.$emit(
+              "upData",
+              "Categoria " +
+                this.form.name +
+                " editado com sucesso! Esse aviso será encerrado em "
+            );
+            this.resetForm();
+          })
+          .catch(function (error) {
+            // add alert error
+            barramento.$emit("loadMain", false);
+            console.log(error);
+          });
       }
     },
-    addCategory(value) {
-      $("#category").modal("hide");
-      let data = [...this.data, value];
-      barramento.$emit("createTable", data);
-      // this.$http
-      //   .post("category", {
-      //     name: value.name,
-      //     description: value.description,
-      //     color: value.color
-      //   })
-      //   .then(res => {
-      //     $("#category").modal("hide");
-      // barramento.$emit(
-      //   "alertCategory",
-      //   "Parada Nº" +
-      //     res.data.number +
-      //     " criado com sucesso! Esse aviso será encerrado em "
-      // );
-      //   })
-      //   .catch(function(error) {
-      //     console.log(error.response);
-      //     alert(error.response.data.message[0].message);
-      //   });
-    }
-  }
+  },
 };
 </script>
 
