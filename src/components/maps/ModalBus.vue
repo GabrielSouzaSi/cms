@@ -138,7 +138,7 @@
                           variant="primary"
                           @click="upCar(temp[`${radio}`][row.index].busId, row.item)"
                         >
-                          <b-icon-arrow-up-down></b-icon-arrow-up-down>
+                          <b-icon-backspace></b-icon-backspace>
                         </b-button>
                       </b-input-group-append>
                     </b-input-group>
