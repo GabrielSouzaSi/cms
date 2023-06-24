@@ -200,6 +200,7 @@ export default {
         { text: "Dia Útil", value: "1" },
         { text: "Sábado", value: "6" },
         { text: "Domingo", value: "0" },
+        { text: "Feriado", value: "7" }, //canpo para feriado
       ],
       table: [],
       temp: [],
@@ -629,7 +630,7 @@ export default {
         alert("A rota ainda não possui uma quadro de horário!");
         this.showTable = true;
         this.add = true;
-        this.hour = { "0": [], "1": [], "6": [] };
+        this.hour = { "0": [], "1": [], "6": [], "7":[] };
       }
       this.table = JSON.parse(JSON.stringify(this.hour));
     },
