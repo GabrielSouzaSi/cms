@@ -6,7 +6,9 @@
         <!-- Modal Header -->
         <div class="modal-header">
           <h4 class="modal-title">Horários</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" data-dismiss="modal">
+            &times;
+          </button>
         </div>
 
         <!-- Modal body -->
@@ -15,13 +17,20 @@
             <div class="row">
               <div class="col">
                 <div class="input-group mb-3">
-                  <select class="form-control" @change="select(selected)" v-model="selected">
+                  <select
+                    class="form-control"
+                    @change="select(selected)"
+                    v-model="selected"
+                  >
                     <option value disabled selected>Selecionar Rota</option>
                     <option
                       v-for="(value, index) in lines"
                       :key="index"
                       :value="value.id"
-                    >{{value.number}} - {{value.description}} - {{value.sense}}</option>
+                    >
+                      {{ value.number }} - {{ value.description }} -
+                      {{ value.sense }}
+                    </option>
                   </select>
                 </div>
               </div>
@@ -39,19 +48,52 @@
                   striped
                   class="text-center rounded-lg shadow-lg"
                 >
-                  <template v-slot:cell(index)="data">{{ data.index + 1 }}</template>
+                  <template v-slot:cell(index)="data">{{
+                    data.index + 1
+                  }}</template>
                   <template v-slot:thead-top>
                     <b-tr>
                       <b-th colspan="3">
-                        <b-form-group label="Corrida Semanal">
+                        <b-form-group label="holidayx">
                           <b-form-radio-group
                             size="sm"
                             v-model="radio"
-                            :options="options"
-                            buttons
                             name="radios-btn"
+                            buttons
                             button-variant="outline-secondary"
-                          ></b-form-radio-group>
+                          >
+                            <b-form-radio value="1">{{
+                              options[0].text
+                            }}</b-form-radio>
+                            <b-form-radio value="6">{{
+                              options[1].text
+                            }}</b-form-radio>
+                            <b-form-radio value="0">{{
+                              options[2].text
+                            }}</b-form-radio>
+                            <b-form-radio value="7">
+                              {{ options[3].text }}
+                              <b-form-checkbox
+                                    id="holidayx"
+                                    v-model="holidayx"
+                                    name="holidayx"
+                                    value="true"
+                                    unchecked-value="false"
+                                  >
+                                  </b-form-checkbox>
+                            </b-form-radio>
+                            <b-form-radio value="8">
+                              {{ options[4].text }}
+                              <b-form-checkbox
+                                    id="checkbox"
+                                    v-model="holiday"
+                                    name="checkbox"
+                                    value="true"
+                                    unchecked-value="false"
+                                  >
+                                  </b-form-checkbox>
+                            </b-form-radio>
+                          </b-form-radio-group>
                         </b-form-group>
                       </b-th>
                       <b-th colspan="2">
@@ -62,7 +104,9 @@
                             </b-button>
                             <b-button variant="success" @click="reply">
                               <b-icon-reply v-if="!replyTable"></b-icon-reply>
-                              <b-icon-reply-all-fill v-if="replyTable"></b-icon-reply-all-fill>
+                              <b-icon-reply-all-fill
+                                v-if="replyTable"
+                              ></b-icon-reply-all-fill>
                             </b-button>
                           </b-button-group>
                         </b-form-group>
@@ -76,18 +120,25 @@
                             id="startTime"
                             name="startTime"
                             v-model="form.start"
-                            style="max-width:100px"
+                            style="max-width: 100px"
                           ></b-form-input>
-                          <b-input-group-prepend is-text>Chegada</b-input-group-prepend>
+                          <b-input-group-prepend is-text
+                            >Chegada</b-input-group-prepend
+                          >
                           <b-form-input
                             type="time"
                             id="endTime"
                             name="endTime"
                             v-model="form.end"
-                            style="max-width:100px"
+                            style="max-width: 100px"
                           ></b-form-input>
-                          <b-input-group-prepend is-text>Ônibus</b-input-group-prepend>
-                          <b-form-select v-model="form.busId" :options="bus"></b-form-select>
+                          <b-input-group-prepend is-text
+                            >Ônibus</b-input-group-prepend
+                          >
+                          <b-form-select
+                            v-model="form.busId"
+                            :options="bus"
+                          ></b-form-select>
                           <b-input-group-append>
                             <b-button variant="success" @click="addHour(form)">
                               <b-icon-check></b-icon-check>
@@ -100,11 +151,15 @@
                       </b-th>
                     </b-tr>
                   </template>
-                  <template v-slot:cell(busId)="data" class="text-center">{{data.value.text}}</template>
+                  <template v-slot:cell(busId)="data" class="text-center">{{
+                    data.value.text
+                  }}</template>
                   <template v-slot:cell(actions)="row" class="text-center">
                     <b-button-group size="sm">
                       <b-button variant="success" @click="row.toggleDetails">
-                        <b-icon-dash-circle v-if="row.detailsShowing"></b-icon-dash-circle>
+                        <b-icon-dash-circle
+                          v-if="row.detailsShowing"
+                        ></b-icon-dash-circle>
                         <b-icon-pencil v-else></b-icon-pencil>
                       </b-button>
                       <b-button variant="danger" @click="delHour(row.index)">
@@ -116,27 +171,38 @@
                     <b-input-group size="sm" prepend="Saída">
                       <b-form-input
                         type="time"
-                        style="max-width:100px"
+                        style="max-width: 100px"
                         v-model="temp[`${radio}`][row.index].start"
                       ></b-form-input>
-                      <b-input-group-prepend is-text>Chegada</b-input-group-prepend>
+                      <b-input-group-prepend is-text
+                        >Chegada</b-input-group-prepend
+                      >
                       <b-form-input
                         type="time"
-                        style="max-width:100px"
+                        style="max-width: 100px"
                         v-model="temp[`${radio}`][row.index].end"
                       ></b-form-input>
-                      <b-input-group-prepend is-text>Ônibus</b-input-group-prepend>
-                      <b-form-select v-model="temp[`${radio}`][row.index].busId" :options="bus"></b-form-select>
+                      <b-input-group-prepend is-text
+                        >Ônibus</b-input-group-prepend
+                      >
+                      <b-form-select
+                        v-model="temp[`${radio}`][row.index].busId"
+                        :options="bus"
+                      ></b-form-select>
                       <b-input-group-append>
                         <b-button
                           variant="success"
-                          @click="updateHour(temp[`${radio}`][row.index], row.index)"
+                          @click="
+                            updateHour(temp[`${radio}`][row.index], row.index)
+                          "
                         >
                           <b-icon-check></b-icon-check>
                         </b-button>
                         <b-button
                           variant="primary"
-                          @click="upCar(temp[`${radio}`][row.index].busId, row.item)"
+                          @click="
+                            upCar(temp[`${radio}`][row.index].busId, row.item)
+                          "
                         >
                           <b-icon-backspace></b-icon-backspace>
                         </b-button>
@@ -152,7 +218,13 @@
         <!-- Modal footer -->
         <div v-show="showTable" class="modal-footer">
           <div class="col">
-            <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">Cancelar</button>
+            <button
+              type="button"
+              class="btn btn-danger btn-block"
+              data-dismiss="modal"
+            >
+              Cancelar
+            </button>
           </div>
           <div class="col">
             <button
@@ -160,13 +232,17 @@
               type="button"
               class="btn btn-success btn-block"
               @click="addSchedule()"
-            >Salvar</button>
+            >
+              Salvar
+            </button>
             <button
-              v-if="!(add)"
+              v-if="!add"
               type="button"
               class="btn btn-success btn-block"
               @click="upSchedule()"
-            >Salvar</button>
+            >
+              Salvar
+            </button>
           </div>
         </div>
       </div>
@@ -200,7 +276,8 @@ export default {
         { text: "Dia Útil", value: "1" },
         { text: "Sábado", value: "6" },
         { text: "Domingo", value: "0" },
-        { text: "Feriado", value: "7" }, //canpo para feriado
+        { text: "Feriado", value: "7" }, //campo para feriado
+        { text: "Férias", value: "8" }, //campo de férias
       ],
       table: [],
       temp: [],
@@ -548,6 +625,8 @@ export default {
       schedule: [],
       line_id: null,
       schedule_id: null,
+      holiday: false,
+      holidayx: false,
     };
   },
   created() {
@@ -556,6 +635,7 @@ export default {
       this.schedule = JSON.parse(JSON.stringify(this.lines));
       this.selected = data;
       // console.log(data);
+      console.log(this.schedule);
       this.select(data);
       $("#modalBus").modal();
     });
@@ -630,13 +710,13 @@ export default {
         alert("A rota ainda não possui uma quadro de horário!");
         this.showTable = true;
         this.add = true;
-        this.hour = { "0": [], "1": [], "6": [], "7":[] };
+        this.hour = { 0: [], 1: [], 6: [], 7: [], 8: [] };
       }
       this.table = JSON.parse(JSON.stringify(this.hour));
     },
     addSchedule() {
-      let data = { weekdays: {} };
-      data.weekdays = this.table
+      let data = { holiday: this.holiday, holidayx: this.holidayx, weekdays: {} };
+      data.weekdays = this.table;
       this.$http
         .post(`lines/${this.selected}/schedules`, {
           hour: data,
@@ -648,11 +728,12 @@ export default {
         .catch(function (error) {
           console.log(error.response);
         });
-      console.log(this.table)
+      console.log(this.table);
     },
     upSchedule() {
       let data = { weekdays: {} };
       data.weekdays = this.table;
+      console.log(data);
       this.$http
         .put(`schedules/${this.schedule_id}`, {
           hour: data,
@@ -664,7 +745,6 @@ export default {
         .catch(function (error) {
           console.log(error);
         });
-      console.log(this.table);
     },
     validBus(data) {
       return (
@@ -687,6 +767,7 @@ export default {
         this.table[`${this.radio}`] = this.replyTemp;
         let table = JSON.parse(JSON.stringify(this.table));
         this.table = table;
+        console.log(this.table);
         this.replyTable = false;
         this.radioTemp = true;
         alert("Dados inseridos!");
