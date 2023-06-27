@@ -703,6 +703,8 @@ export default {
 
       if (data[0].schedules) {
         this.hour = data[0].schedules.hour.weekdays;
+        this.holiday = data[0].schedules.hour.holiday;
+        this.holidayx = data[0].schedules.hour.holidayx;
         this.schedule_id = data[0].schedules.id;
         this.line_id = data[0].id;
         this.showTable = true;
@@ -723,7 +725,11 @@ export default {
         })
         .then((res) => {
           console.log(res.data);
-          alert("Dados salvos!");
+          $("#modalBus").modal();
+          barramento.$emit(
+              "edited",
+              "Dados de horários salvos!"
+            );
         })
         .catch(function (error) {
           console.log(error.response);
@@ -731,7 +737,7 @@ export default {
       console.log(this.table);
     },
     upSchedule() {
-      let data = { weekdays: {} };
+      let data = { holiday: this.holiday, holidayx: this.holidayx, weekdays: {} };
       data.weekdays = this.table;
       console.log(data);
       this.$http
@@ -740,7 +746,11 @@ export default {
         })
         .then((res) => {
           console.log(res.data);
-          alert("Dados atualizados!");
+          $("#modalBus").modal();
+          barramento.$emit(
+              "edited",
+              "Dados de horários salvos!"
+            );
         })
         .catch(function (error) {
           console.log(error);
