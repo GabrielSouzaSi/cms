@@ -151,10 +151,10 @@
                       </b-th>
                     </b-tr>
                   </template>
-                  <template v-slot:cell(busId)="data" class="text-center">{{
+                  <template v-slot:cell(busId)="data">{{
                     data.value.text
                   }}</template>
-                  <template v-slot:cell(actions)="row" class="text-center">
+                  <template v-slot:cell(actions)="row">
                     <b-button-group size="sm">
                       <b-button variant="success" @click="row.toggleDetails">
                         <b-icon-dash-circle
@@ -314,7 +314,8 @@ export default {
         },
       ],
       hour: [],
-      bus: [
+      bus: null,
+      busOld: [
         {
           value: 1,
           text: "NÃO INFORMADO",
@@ -630,6 +631,7 @@ export default {
     };
   },
   created() {
+    this.getBus();
     // a função recebe o id da linha selecionada
     barramento.$on("mSchedule", (data) => {
       this.schedule = JSON.parse(JSON.stringify(this.lines));
@@ -641,6 +643,19 @@ export default {
     });
   },
   methods: {
+    getBus(){
+      this.$http
+        .get('freebus')
+        .then(res => {
+          console.log(res.data);
+          this.bus = res.data;
+          // barramento.$emit("loadMain", false);
+        })
+        .catch(function(error) {
+          // barramento.$emit("loadMain", false);
+          console.log(error);
+        });
+    },
     week(data) {
       this.table = this.hour[`${data}`];
     },
@@ -693,7 +708,7 @@ export default {
         this.table[`${this.radio}`] = result;
         const temp = JSON.parse(JSON.stringify(this.table));
         this.table = temp;
-        console.log(this.table);
+        // console.log(this.table);
       }
     },
     select(id) {
@@ -723,9 +738,9 @@ export default {
         .post(`lines/${this.selected}/schedules`, {
           hour: data,
         })
-        .then((res) => {
-          console.log(res.data);
-          $("#modalBus").modal();
+        .then(() => {
+          this.getBus();
+          $("#modalBus").modal("hide");
           barramento.$emit(
               "edited",
               "Dados de horários salvos!"
@@ -737,16 +752,18 @@ export default {
       console.log(this.table);
     },
     upSchedule() {
+      barramento.$emit("loadMain", true);
       let data = { holiday: this.holiday, holidayx: this.holidayx, weekdays: {} };
       data.weekdays = this.table;
-      console.log(data);
+      // console.log(data);
       this.$http
         .put(`schedules/${this.schedule_id}`, {
           hour: data,
         })
-        .then((res) => {
-          console.log(res.data);
-          $("#modalBus").modal();
+        .then(() => {
+          this.getBus();
+          $("#modalBus").modal("hide");
+          barramento.$emit("loadMain", false);
           barramento.$emit(
               "edited",
               "Dados de horários salvos!"
@@ -777,7 +794,7 @@ export default {
         this.table[`${this.radio}`] = this.replyTemp;
         let table = JSON.parse(JSON.stringify(this.table));
         this.table = table;
-        console.log(this.table);
+        // console.log(this.table);
         this.replyTable = false;
         this.radioTemp = true;
         alert("Dados inseridos!");

@@ -364,7 +364,7 @@ export default {
             sense: value.sense,
             description: value.description.toUpperCase(),
             route: this.form.fileData,
-            // points: this.form.points
+            points: this.form.points
           })
           .then((res) => {
             console.log(res);
