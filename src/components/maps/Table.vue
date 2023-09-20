@@ -105,10 +105,6 @@ export default {
           sortable: true
         },
         {
-          key: "sense",
-          label: "Sentido"
-        },
-        {
           key: "address",
           label: "Endereço"
         },

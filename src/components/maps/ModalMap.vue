@@ -9,7 +9,9 @@
             v-for="(value, index) in lines"
             :key="index"
             v-bind:value="value.id"
-          >{{value.number}} - {{value.description}} - {{value.sense}}</option>
+          >
+            {{ value.number }} - {{ value.description }} - {{ value.sense }}
+          </option>
         </select>
       </b-col>
     </b-row>
@@ -19,23 +21,33 @@
           v-show="showMap"
           :center="{ lat: 2.8038037, lng: -60.7055189 }"
           :zoom="13"
-          style="width:100%;  height: 600px;"
-          :options="{disableDefaultUI: true}"
+          style="width: 100%; height: 600px"
+          :options="{ disableDefaultUI: true }"
         >
           <gmap-info-window
             :options="infoOptions"
             :position="infoWindowPos"
             :opened="infoWinOpen"
-            @closeclick="infoWinOpen=false"
+            @closeclick="infoWinOpen = false"
           ></gmap-info-window>
           <gmap-marker
             :key="i"
             v-for="(m, i) in markers"
             :position="m.position"
             :clickable="true"
-            @click="toggleInfoWindow(m,i)"
+            @click="toggleInfoWindow(m, i)"
           ></gmap-marker>
-          <gmap-polyline :options="{'strokeColor': '#FF0000'}" :path="route"></gmap-polyline>
+          <gmap-marker
+            :key="i"
+            v-for="(m, i) in bus"
+            :position="m.position"
+            :clickable="true"
+            @click="toggleInfoWindow(m, i)"
+          ></gmap-marker>
+          <gmap-polyline
+            :options="{ strokeColor: '#FF0000' }"
+            :path="route"
+          ></gmap-polyline>
         </gmap-map>
       </b-col>
     </b-row>
@@ -57,6 +69,7 @@ export default {
       showMap: false,
       center: {},
       markers: [],
+      bus: [],
       route: [],
       currentPlace: null,
       infoWindowPos: null,
@@ -116,6 +129,27 @@ export default {
         .get(`lines/${this.selected}/points`)
         .then(res => {
           this.formatMap(res.data);
+          this.loadBus();
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+    loadBus(){
+      this.bus = [];
+      this.$http
+        .get(`lines/search/${this.selected}`)
+        .then(res => {
+          var veic = res.data.data[1].map(function(item) {
+            return {
+              position: { lat: Number(item.latitude), lng: Number(item.longitude) },
+              infoText: `<strong>Ônibus ${item.plate}</item>`
+            };
+          });
+          this.bus = veic;
+          // console.log('onibus',veic);
+          // console.log(res.data.data[1]);
+
         })
         .catch(function(error) {
           console.log(error);

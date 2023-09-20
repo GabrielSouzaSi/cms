@@ -48,13 +48,10 @@
                   striped
                   class="text-center rounded-lg shadow-lg"
                 >
-                  <template v-slot:cell(index)="data">{{
-                    data.index + 1
-                  }}</template>
                   <template v-slot:thead-top>
                     <b-tr>
                       <b-th colspan="3">
-                        <b-form-group label="holidayx">
+                        <b-form-group label="Programação">
                           <b-form-radio-group
                             size="sm"
                             v-model="radio"
@@ -74,24 +71,24 @@
                             <b-form-radio value="7">
                               {{ options[3].text }}
                               <b-form-checkbox
-                                    id="holidayx"
-                                    v-model="holidayx"
-                                    name="holidayx"
-                                    value="true"
-                                    unchecked-value="false"
-                                  >
-                                  </b-form-checkbox>
+                                id="holidayx"
+                                v-model="holidayx"
+                                name="holidayx"
+                                value="true"
+                                unchecked-value="false"
+                              >
+                              </b-form-checkbox>
                             </b-form-radio>
                             <b-form-radio value="8">
                               {{ options[4].text }}
                               <b-form-checkbox
-                                    id="checkbox"
-                                    v-model="holiday"
-                                    name="checkbox"
-                                    value="true"
-                                    unchecked-value="false"
-                                  >
-                                  </b-form-checkbox>
+                                id="checkbox"
+                                v-model="holiday"
+                                name="checkbox"
+                                value="true"
+                                unchecked-value="false"
+                              >
+                              </b-form-checkbox>
                             </b-form-radio>
                           </b-form-radio-group>
                         </b-form-group>
@@ -112,15 +109,17 @@
                         </b-form-group>
                       </b-th>
                     </b-tr>
+                    <!-- ADICIONAR HORÁRIO -->
                     <b-tr v-show="show">
-                      <b-th colspan="5">
+                      <b-th colspan="12">
                         <b-input-group size="sm" prepend="Saída">
                           <b-form-input
                             type="time"
                             id="startTime"
                             name="startTime"
+                            step="2"
                             v-model="form.start"
-                            style="max-width: 100px"
+                            style="max-width: 110px"
                           ></b-form-input>
                           <b-input-group-prepend is-text
                             >Chegada</b-input-group-prepend
@@ -129,18 +128,23 @@
                             type="time"
                             id="endTime"
                             name="endTime"
+                            step="2"
                             v-model="form.end"
-                            style="max-width: 100px"
+                            style="max-width: 110px"
                           ></b-form-input>
                           <b-input-group-prepend is-text
                             >Ônibus</b-input-group-prepend
                           >
                           <b-form-select
-                            v-model="form.busId"
+                            v-model="form.id"
                             :options="bus"
+                            @change="findBus(form.id)"
                           ></b-form-select>
                           <b-input-group-append>
-                            <b-button variant="success" @click="addHour(form)">
+                            <b-button
+                              variant="success"
+                              @click="infoBus ? addHour(form) : notFoundBus()"
+                            >
                               <b-icon-check></b-icon-check>
                             </b-button>
                             <b-button variant="danger" @click="show = !show">
@@ -151,6 +155,11 @@
                       </b-th>
                     </b-tr>
                   </template>
+
+                  <template v-slot:cell(index)="data">{{
+                    data.index + 1
+                  }}</template>
+
                   <template v-slot:cell(busId)="data">{{
                     data.value.text
                   }}</template>
@@ -171,7 +180,8 @@
                     <b-input-group size="sm" prepend="Saída">
                       <b-form-input
                         type="time"
-                        style="max-width: 100px"
+                        step="2"
+                        style="max-width: 110px"
                         v-model="temp[`${radio}`][row.index].start"
                       ></b-form-input>
                       <b-input-group-prepend is-text
@@ -179,32 +189,45 @@
                       >
                       <b-form-input
                         type="time"
-                        style="max-width: 100px"
+                        step="2"
+                        style="max-width: 110px"
                         v-model="temp[`${radio}`][row.index].end"
                       ></b-form-input>
                       <b-input-group-prepend is-text
                         >Ônibus</b-input-group-prepend
                       >
+
+                      <!-- SELECIONAR ÔNIBUS -->
                       <b-form-select
-                        v-model="temp[`${radio}`][row.index].busId"
+                        v-model="temp[`${radio}`][row.index].id"
                         :options="bus"
+                        @change="findBus(temp[`${radio}`][row.index].id)"
                       ></b-form-select>
+
                       <b-input-group-append>
-                        <b-button
+                        <!-- <b-button
                           variant="success"
                           @click="
                             updateHour(temp[`${radio}`][row.index], row.index)
                           "
                         >
                           <b-icon-check></b-icon-check>
-                        </b-button>
+                        </b-button> -->
                         <b-button
-                          variant="primary"
+                          v-if="infoBus"
+                          variant="success"
                           @click="
                             upCar(temp[`${radio}`][row.index].busId, row.item)
                           "
                         >
-                          <b-icon-backspace></b-icon-backspace>
+                          <b-icon-check></b-icon-check>
+                        </b-button>
+                        <b-button
+                          v-else
+                          variant="danger"
+                          @click="row.toggleDetails"
+                        >
+                          <b-icon-dash-circle></b-icon-dash-circle>
                         </b-button>
                       </b-input-group-append>
                     </b-input-group>
@@ -253,6 +276,7 @@
 <script>
 import $ from "jquery";
 import barramento from "@/eventBus/barramento";
+import json from "../../data_03072023.json";
 export default {
   props: {
     // todas as linha
@@ -266,6 +290,7 @@ export default {
   },
   data() {
     return {
+      jsonHour: json,
       show: false,
       showTable: false,
       add: null,
@@ -282,6 +307,7 @@ export default {
       table: [],
       temp: [],
       form: {
+        id: "",
         start: "",
         end: "",
         busId: "",
@@ -621,6 +647,8 @@ export default {
           text: "CAR3205",
         },
       ],
+      lineSelected: null,
+      infoBus: true,
       replyTable: false,
       replyTemp: [],
       schedule: [],
@@ -628,6 +656,7 @@ export default {
       schedule_id: null,
       holiday: false,
       holidayx: false,
+      hoursSchedule: [],
     };
   },
   created() {
@@ -637,24 +666,82 @@ export default {
       this.schedule = JSON.parse(JSON.stringify(this.lines));
       this.selected = data;
       // console.log(data);
-      console.log(this.schedule);
+      // console.log(this.schedule);
       this.select(data);
       $("#modalBus").modal();
     });
   },
   methods: {
-    getBus(){
+    getBus() {
       this.$http
-        .get('freebus')
-        .then(res => {
-          console.log(res.data);
-          this.bus = res.data;
+        .get("bus")
+        .then((res) => {
+          // console.log(res.data);
+          this.bus = res.data.map(function (item) {
+            return { value: item.id, text: item.description };
+          });
+          // console.log(res.data);
+          // console.log(this.bus);
           // barramento.$emit("loadMain", false);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           // barramento.$emit("loadMain", false);
           console.log(error);
         });
+    },
+    findHour() {
+      let id = `${
+        this.lineSelected[0].number
+      }${this.lineSelected[0].sense.slice(0, 1)}`;
+      let hour = this.jsonHour.filter((obj) => obj.trip_id == id);
+      const length = hour[0].hours[0].length;
+      for (let c = 0; c < hour[0].hours.length; c++) {
+        // console.log("Viagem: " + c);
+        for (let l = 0; l < 1; l++) {
+          let data = {
+            start: hour[0].hours[c][l],
+            end: hour[0].hours[c][length - 1],
+            busId: 1,
+            bus: "NÃO INFORMADO",
+          };
+          this.hoursSchedule.push(data);
+        }
+      }
+      console.log(this.hoursSchedule);
+      // console.log(this.lineSelected[0].weekdays);
+      //console.log(hour);
+    },
+    findBus(id) {
+      console.log(id);
+      $("#modalBus").modal("hide");
+      barramento.$emit("loadMain", true);
+      this.$http
+        .get(`lines/busLocationt/${id}`)
+        .then((res) => {
+          console.log(res.data);
+          this.infoBus = true;
+          // res.data.length > 0 ? (this.infoBus = true) : this.notFoundBus();
+
+          barramento.$emit("loadMain", false);
+          $("#modalBus").modal();
+        })
+        .catch(function (error) {
+          barramento.$emit("loadMain", false);
+          $("#modalBus").modal();
+          // barramento.$emit("loadMain", false);
+          console.log(error);
+        });
+
+      // setTimeout(() => {
+      //   barramento.$emit("loadMain", false);
+      //   $("#modalBus").modal();
+      //   this.notFoundBus();
+      //   this.infoBus = false;
+      // }, 3000);
+    },
+    notFoundBus() {
+      this.infoBus = false;
+      alert("Ônibus não encontrado, selecione outro ônibus!");
     },
     week(data) {
       this.table = this.hour[`${data}`];
@@ -712,16 +799,17 @@ export default {
       }
     },
     select(id) {
-      let data = this.schedule.filter((item) => item.id === id);
+      this.lineSelected = this.schedule.filter((item) => item.id === id);
 
       // console.log(data[0])
 
-      if (data[0].schedules) {
-        this.hour = data[0].schedules.hour.weekdays;
-        this.holiday = data[0].schedules.hour.holiday;
-        this.holidayx = data[0].schedules.hour.holidayx;
-        this.schedule_id = data[0].schedules.id;
-        this.line_id = data[0].id;
+      if (this.lineSelected[0].schedules) {
+        this.findHour();
+        this.hour = this.lineSelected[0].schedules.hour.weekdays;
+        this.holiday = this.lineSelected[0].schedules.hour.holiday;
+        this.holidayx = this.lineSelected[0].schedules.hour.holidayx;
+        this.schedule_id = this.lineSelected[0].schedules.id;
+        this.line_id = this.lineSelected[0].id;
         this.showTable = true;
       } else {
         alert("A rota ainda não possui uma quadro de horário!");
@@ -730,9 +818,14 @@ export default {
         this.hour = { 0: [], 1: [], 6: [], 7: [], 8: [] };
       }
       this.table = JSON.parse(JSON.stringify(this.hour));
+      this.getBus();
     },
     addSchedule() {
-      let data = { holiday: this.holiday, holidayx: this.holidayx, weekdays: {} };
+      let data = {
+        holiday: this.holiday,
+        holidayx: this.holidayx,
+        weekdays: {},
+      };
       data.weekdays = this.table;
       this.$http
         .post(`lines/${this.selected}/schedules`, {
@@ -741,10 +834,7 @@ export default {
         .then(() => {
           this.getBus();
           $("#modalBus").modal("hide");
-          barramento.$emit(
-              "edited",
-              "Dados de horários salvos!"
-            );
+          barramento.$emit("edited", "Dados de horários salvos!");
         })
         .catch(function (error) {
           console.log(error.response);
@@ -753,7 +843,11 @@ export default {
     },
     upSchedule() {
       barramento.$emit("loadMain", true);
-      let data = { holiday: this.holiday, holidayx: this.holidayx, weekdays: {} };
+      let data = {
+        holiday: this.holiday,
+        holidayx: this.holidayx,
+        weekdays: {},
+      };
       data.weekdays = this.table;
       // console.log(data);
       this.$http
@@ -764,10 +858,7 @@ export default {
           this.getBus();
           $("#modalBus").modal("hide");
           barramento.$emit("loadMain", false);
-          barramento.$emit(
-              "edited",
-              "Dados de horários salvos!"
-            );
+          barramento.$emit("edited", "Dados de horários salvos!");
         })
         .catch(function (error) {
           console.log(error);
