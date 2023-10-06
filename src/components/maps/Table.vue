@@ -36,7 +36,7 @@
           borderless
           class="text-center rounded-lg shadow-lg"
         >
-          <template v-slot:cell(actions)="data" class="text-center">
+          <template v-slot:cell(actions)="data">
             <b-button-group size="sm">
               <b-button
                 variant="success"

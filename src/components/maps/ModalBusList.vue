@@ -49,20 +49,26 @@
                       </b-tr>
                       <b-tr v-show="show">
                         <b-th colspan="12">
-                          <div class="mx-auto">  
+                          <div class="mx-auto">
                             <b-input-group size="sm" prepend="Veículo">
                               <b-form-input
-                              type="text"
-                              id="bus"
-                              name="bus"
-                              v-model="form.bus"
-                              style="max-width: 100px"
+                                type="text"
+                                id="bus"
+                                name="bus"
+                                v-model="form.description"
+                                style="max-width: 110px"
                               ></b-form-input>
                               <b-input-group-append>
-                                <b-button variant="success" @click="createBus()">
+                                <b-button
+                                  variant="success"
+                                  @click="filterBusList(form)"
+                                >
                                   <b-icon-check></b-icon-check>
                                 </b-button>
-                                <b-button variant="danger" @click="show = !show">
+                                <b-button
+                                  variant="danger"
+                                  @click="show = !show"
+                                >
                                   <b-icon-x-square></b-icon-x-square>
                                 </b-button>
                               </b-input-group-append>
@@ -101,7 +107,7 @@
                         ></b-form-input>
 
                         <b-input-group-append>
-                          <b-button v-if="bus" variant="success">
+                          <b-button v-if="bus" variant="success" @click="filterBusList(tempBus[row.index])">
                             <b-icon-check></b-icon-check>
                           </b-button>
                           <b-button
@@ -128,13 +134,16 @@
 <script>
 import $ from "jquery";
 import barramento from "@/eventBus/barramento";
+import json from "../../busGPS.json";
 export default {
   data() {
     return {
+      busJsonGPS: json,
       show: false,
       form: {
-        bus: "",
-        idBus: null
+        description: null,
+        idBus: null,
+        busId: null,
       },
       fields: [
         {
@@ -152,6 +161,7 @@ export default {
       ],
       bus: [],
       tempBus: [],
+      busLocation: null,
     };
   },
   created() {
@@ -183,8 +193,8 @@ export default {
       barramento.$emit("loadMain", true);
       this.$http
         .post(`bus`, {
-          idBus: this.form.idBus,
-          description: this.form.bus.toLocaleUpperCase(),
+          idBus: this.form.busId,
+          description: this.form.description.toLocaleUpperCase(),
         })
         .then((res) => {
           console.log(res);
@@ -200,13 +210,80 @@ export default {
     },
     deleteBus(data) {
       confirm("Deseja realmente remover o ônibus " + data.description + "?")
-        ? console.log("sim!")
+        ? this.delete(data.id)
         : console.log("não!");
     },
     setBus(bus) {
       console.log(bus);
     },
-    delete() {},
+    delete(id) {
+      this.$http
+        .delete(`bus/${id}`)
+        .then((res) => {
+          this.getBusList();
+          console.log(res);
+        })
+        .catch(function (error) {
+          barramento.$emit("loadMain", false);
+          console.log(error);
+        });
+    },
+    //Requisição para obter dados dos onibus com GPS
+    busGPS() {
+      $("#modalBusList").modal("hide");
+      this.$http
+        .get(`locations/bus`)
+        .then((res) => {
+          this.busLocation = res.data;
+          console.log(this.busLocation);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+
+    filterBusList(bus) {
+      console.log(bus);
+      //Filtro para buscar onibus existente na lista
+      let data = this.bus.filter((item) => item.description === bus.description);
+
+
+      // let gps = this.filterBusGPS(bus.description);
+
+      
+      if (data.length > 0 ) {
+        //Verifica se existe onibus e se a identifação do gps são os mesmos do arquivo json
+        alert("O ônibus informado já existe!");
+      } else if(bus.description != this.form.description) {
+        //caso a identificação do gps seja diferente é atualizado!        
+        // alert("Precisa atualizar");
+        this.$http
+        .put(`bus/${bus.id}`, {
+          idBus: bus.busId,
+          description: bus.description,
+        })
+        .then((res) => {
+          console.log(res);
+          this.getBusList();
+        })
+        .catch(function (error) {
+        
+          // barramento.$emit("loadMain", false);
+          console.log(error);
+        });
+      }else{
+        // cadastra um ônibus novo
+        // alert("Precisa cadastrar o ônibus!");
+        this.createBus();
+      }
+      
+      
+    },
+    //Filtro para buscar o onibus com gps que o usuario informou
+    filterBusGPS(bus) {
+      let data = this.busJsonGPS.filter((item) => item.plate === bus);
+      return data[0]
+    },
   },
   watch: {
     bus(v1) {

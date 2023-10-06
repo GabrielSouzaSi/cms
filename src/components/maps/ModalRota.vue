@@ -129,7 +129,7 @@
                   <template slot="selection" slot-scope="{ values, isOpen }">
                     <span
                       class="multiselect__single"
-                      v-if="values.length &amp;&amp; !isOpen"
+                      v-if="(values.length &amp;&amp; !isOpen)"
                     >{{ value.length }} paradas selecionadas!</span>
                   </template>
                 </multiselect>
@@ -245,7 +245,7 @@ export default {
         this.value = data.points.map(function (item) {
           return {
             id: item.id,
-            text: item.number + " " + item.address + " - " + item.sense,
+            text: item.number + " " + item.address
           };
         });
         this.form.id = data.id;
@@ -275,7 +275,7 @@ export default {
       this.$http
         .post("lines", {
           number: value.number,
-          sense: value.sense,
+          sense: value.sense.toUpperCase(),
           description: value.description.toUpperCase(),
           route: this.form.fileData,
         })
@@ -361,7 +361,7 @@ export default {
         this.$http
           .put(`lines/${value.id}`, {
             number: value.number,
-            sense: value.sense,
+            sense: value.sense.toUpperCase(),
             description: value.description.toUpperCase(),
             route: this.form.fileData,
             points: this.form.points
@@ -464,14 +464,14 @@ export default {
             file.name + " " + this.form.fileData.length + " pontos lidos!";
         }, 2000);
       }
-    },
+    }
   },
   watch: {
     points(v1) {
       var obj = v1.map(function (item) {
         return {
           id: item.id,
-          text: item.number + " " + item.address + " - " + item.sense,
+          text: item.number + " " + item.address,
         };
       });
       this.data = obj;

@@ -11,6 +11,20 @@
           </button>
         </div>
 
+        <template>
+          <div>
+            <b-alert
+              :show="dismissCountDown"
+              dismissible
+              variant="success"
+              @dismissed="dismissCountDown = 0"
+              @dismiss-count-down="countDownChanged"
+            >
+              Horários atualizados
+            </b-alert>
+          </div>
+        </template>
+
         <!-- Modal body -->
         <div class="modal-body">
           <form action>
@@ -35,204 +49,228 @@
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <b-table
-                  v-show="showTable"
-                  :items="table[`${radio}`]"
-                  :fields="fields"
-                  small
-                  hover
-                  borderless
-                  responsive
-                  striped
-                  class="text-center rounded-lg shadow-lg"
-                >
-                  <template v-slot:thead-top>
-                    <b-tr>
-                      <b-th colspan="3">
-                        <b-form-group label="Programação">
-                          <b-form-radio-group
-                            size="sm"
-                            v-model="radio"
-                            name="radios-btn"
-                            buttons
-                            button-variant="outline-secondary"
-                          >
-                            <b-form-radio value="1">{{
-                              options[0].text
-                            }}</b-form-radio>
-                            <b-form-radio value="6">{{
-                              options[1].text
-                            }}</b-form-radio>
-                            <b-form-radio value="0">{{
-                              options[2].text
-                            }}</b-form-radio>
-                            <b-form-radio value="7">
-                              {{ options[3].text }}
-                              <b-form-checkbox
-                                id="holidayx"
-                                v-model="holidayx"
-                                name="holidayx"
-                                value="true"
-                                unchecked-value="false"
-                              >
-                              </b-form-checkbox>
-                            </b-form-radio>
-                            <b-form-radio value="8">
-                              {{ options[4].text }}
-                              <b-form-checkbox
-                                id="checkbox"
-                                v-model="holiday"
-                                name="checkbox"
-                                value="true"
-                                unchecked-value="false"
-                              >
-                              </b-form-checkbox>
-                            </b-form-radio>
-                          </b-form-radio-group>
-                        </b-form-group>
-                      </b-th>
-                      <b-th colspan="2">
-                        <b-form-group label="Hora e Ônibus">
-                          <b-button-group size="sm">
-                            <b-button variant="primary" @click="show = !show">
-                              <b-icon-plus-square></b-icon-plus-square>
-                            </b-button>
-                            <b-button variant="success" @click="reply">
-                              <b-icon-reply v-if="!replyTable"></b-icon-reply>
-                              <b-icon-reply-all-fill
-                                v-if="replyTable"
-                              ></b-icon-reply-all-fill>
-                            </b-button>
-                          </b-button-group>
-                        </b-form-group>
-                      </b-th>
-                    </b-tr>
-                    <!-- ADICIONAR HORÁRIO -->
-                    <b-tr v-show="show">
-                      <b-th colspan="12">
-                        <b-input-group size="sm" prepend="Saída">
-                          <b-form-input
-                            type="time"
-                            id="startTime"
-                            name="startTime"
-                            step="2"
-                            v-model="form.start"
-                            style="max-width: 110px"
-                          ></b-form-input>
-                          <b-input-group-prepend is-text
-                            >Chegada</b-input-group-prepend
-                          >
-                          <b-form-input
-                            type="time"
-                            id="endTime"
-                            name="endTime"
-                            step="2"
-                            v-model="form.end"
-                            style="max-width: 110px"
-                          ></b-form-input>
-                          <b-input-group-prepend is-text
-                            >Ônibus</b-input-group-prepend
-                          >
-                          <b-form-select
-                            v-model="form.id"
-                            :options="bus"
-                            @change="findBus(form.id)"
-                          ></b-form-select>
-                          <b-input-group-append>
-                            <b-button
-                              variant="success"
-                              @click="infoBus ? addHour(form) : notFoundBus()"
+            <div
+              style="
+                position: relative;
+                overflow-y: auto;
+                overflow-x: hidden;
+                max-height: 500px;
+              "
+            >
+              <div class="row">
+                <div class="col">
+                  <b-table
+                    v-show="showTable"
+                    :items="table[`${radio}`]"
+                    :fields="fields"
+                    :busy="isBusy"
+                    small
+                    hover
+                    borderless
+                    responsive
+                    striped
+                    class="text-center rounded-lg shadow-lg"
+                  >
+                    <template v-slot:thead-top>
+                      <b-tr>
+                        <b-th colspan="3">
+                          <b-form-group label="Programação">
+                            <b-form-radio-group
+                              size="sm"
+                              v-model="radio"
+                              name="radios-btn"
+                              buttons
+                              button-variant="outline-secondary"
                             >
-                              <b-icon-check></b-icon-check>
-                            </b-button>
-                            <b-button variant="danger" @click="show = !show">
-                              <b-icon-x-square></b-icon-x-square>
-                            </b-button>
-                          </b-input-group-append>
-                        </b-input-group>
-                      </b-th>
-                    </b-tr>
-                  </template>
+                              <b-form-radio value="1">{{
+                                options[0].text
+                              }}</b-form-radio>
+                              <b-form-radio value="6">{{
+                                options[1].text
+                              }}</b-form-radio>
+                              <b-form-radio value="0">{{
+                                options[2].text
+                              }}</b-form-radio>
+                              <b-form-radio value="7">
+                                {{ options[3].text }}
+                                <b-form-checkbox
+                                  id="holidayx"
+                                  v-model="holidayx"
+                                  name="holidayx"
+                                  value="true"
+                                  unchecked-value="false"
+                                >
+                                </b-form-checkbox>
+                              </b-form-radio>
+                              <b-form-radio value="8">
+                                {{ options[4].text }}
+                                <b-form-checkbox
+                                  id="checkbox"
+                                  v-model="holiday"
+                                  name="checkbox"
+                                  value="true"
+                                  unchecked-value="false"
+                                >
+                                </b-form-checkbox>
+                              </b-form-radio>
+                            </b-form-radio-group>
+                          </b-form-group>
+                        </b-th>
+                        <b-th colspan="3">
+                          <b-form-group label="Hora e Ônibus">
+                            <b-button-group size="sm">
+                              <b-button variant="primary" @click="show = !show">
+                                <b-icon-plus-square></b-icon-plus-square>
+                              </b-button>
+                              <b-button variant="success" @click="reply">
+                                <b-icon-reply v-if="!replyTable"></b-icon-reply>
+                                <b-icon-reply-all-fill
+                                  v-if="replyTable"
+                                ></b-icon-reply-all-fill>
+                              </b-button>
+                            </b-button-group>
+                          </b-form-group>
+                        </b-th>
+                      </b-tr>
 
-                  <template v-slot:cell(index)="data">{{
-                    data.index + 1
-                  }}</template>
+                      <!-- ADICIONAR HORÁRIO -->
+                      <b-tr v-show="show">
+                        <b-th colspan="12">
+                          <b-input-group size="sm" prepend="Saída">
+                            <b-form-input
+                              type="time"
+                              id="startTime"
+                              name="startTime"
+                              step="2"
+                              v-model="form.start"
+                              style="max-width: 110px"
+                            ></b-form-input>
+                            <b-input-group-prepend is-text
+                              >Chegada</b-input-group-prepend
+                            >
+                            <b-form-input
+                              type="time"
+                              id="endTime"
+                              name="endTime"
+                              step="2"
+                              v-model="form.end"
+                              style="max-width: 110px"
+                            ></b-form-input>
+                            <b-input-group-prepend is-text
+                              >Ônibus</b-input-group-prepend
+                            >
+                            <b-form-select
+                              v-model="form.id"
+                              @change="findBus(form.id)"
+                            >
+                              <option
+                                v-for="(value, index) in bus"
+                                :key="index"
+                                :value="value.id"
+                              >
+                                {{ value.description }}
+                              </option>
+                            </b-form-select>
+                            <b-input-group-append>
+                              <b-button
+                                variant="success"
+                                @click="infoBus ? addHour(form) : notFoundBus()"
+                              >
+                                <b-icon-check></b-icon-check>
+                              </b-button>
+                              <b-button variant="danger" @click="show = !show">
+                                <b-icon-x-square></b-icon-x-square>
+                              </b-button>
+                            </b-input-group-append>
+                          </b-input-group>
+                        </b-th>
+                      </b-tr>
+                    </template>
 
-                  <template v-slot:cell(busId)="data">{{
-                    data.value.text
-                  }}</template>
-                  <template v-slot:cell(actions)="row">
-                    <b-button-group size="sm">
-                      <b-button variant="success" @click="row.toggleDetails">
-                        <b-icon-dash-circle
-                          v-if="row.detailsShowing"
-                        ></b-icon-dash-circle>
-                        <b-icon-pencil v-else></b-icon-pencil>
-                      </b-button>
-                      <b-button variant="danger" @click="delHour(row.index)">
-                        <b-icon-x-square></b-icon-x-square>
-                      </b-button>
-                    </b-button-group>
-                  </template>
-                  <template v-slot:row-details="row">
-                    <b-input-group size="sm" prepend="Saída">
-                      <b-form-input
-                        type="time"
-                        step="2"
-                        style="max-width: 110px"
-                        v-model="temp[`${radio}`][row.index].start"
-                      ></b-form-input>
-                      <b-input-group-prepend is-text
-                        >Chegada</b-input-group-prepend
-                      >
-                      <b-form-input
-                        type="time"
-                        step="2"
-                        style="max-width: 110px"
-                        v-model="temp[`${radio}`][row.index].end"
-                      ></b-form-input>
-                      <b-input-group-prepend is-text
-                        >Ônibus</b-input-group-prepend
-                      >
+                    <template v-slot:cell(index)="data">{{
+                      data.index + 1
+                    }}</template>
 
-                      <!-- SELECIONAR ÔNIBUS -->
-                      <b-form-select
-                        v-model="temp[`${radio}`][row.index].id"
-                        :options="bus"
-                        @change="findBus(temp[`${radio}`][row.index].id)"
-                      ></b-form-select>
-
-                      <b-input-group-append>
-                        <!-- <b-button
-                          variant="success"
-                          @click="
-                            updateHour(temp[`${radio}`][row.index], row.index)
-                          "
-                        >
-                          <b-icon-check></b-icon-check>
-                        </b-button> -->
-                        <b-button
-                          v-if="infoBus"
-                          variant="success"
-                          @click="
-                            upCar(temp[`${radio}`][row.index].busId, row.item)
-                          "
-                        >
-                          <b-icon-check></b-icon-check>
+                    <template v-slot:cell(id)="data">{{
+                      data.value.description
+                    }}</template>
+                    <template v-slot:cell(actions)="row">
+                      <b-button-group size="sm">
+                        <b-button variant="success" @click="row.toggleDetails">
+                          <b-icon-dash-circle
+                            v-if="row.detailsShowing"
+                          ></b-icon-dash-circle>
+                          <b-icon-pencil v-else></b-icon-pencil>
                         </b-button>
-                        <b-button
-                          v-else
-                          variant="danger"
-                          @click="row.toggleDetails"
-                        >
-                          <b-icon-dash-circle></b-icon-dash-circle>
+                        <b-button variant="danger" @click="delHour(row.index)">
+                          <b-icon-x-square></b-icon-x-square>
                         </b-button>
-                      </b-input-group-append>
-                    </b-input-group>
-                  </template>
-                </b-table>
+                      </b-button-group>
+                    </template>
+                    <template v-slot:row-details="row">
+                      <b-input-group size="sm" prepend="Saída">
+                        <b-form-input
+                          type="time"
+                          step="2"
+                          style="max-width: 110px"
+                          v-model="temp[`${radio}`][row.index].start"
+                        ></b-form-input>
+                        <b-input-group-prepend is-text
+                          >Chegada</b-input-group-prepend
+                        >
+                        <b-form-input
+                          type="time"
+                          step="2"
+                          style="max-width: 110px"
+                          v-model="temp[`${radio}`][row.index].end"
+                        ></b-form-input>
+                        <b-input-group-prepend is-text
+                          >Ônibus</b-input-group-prepend
+                        >
+
+                        <!-- SELECIONAR ÔNIBUS -->
+                        <b-form-select
+                          v-model="temp[`${radio}`][row.index].id"
+                          @change="findBus(temp[`${radio}`][row.index].id)"
+                        >
+                          <option
+                            v-for="(value, index) in bus"
+                            :key="index"
+                            :value="value.id"
+                          >
+                            {{ value.description }}
+                          </option>
+                        </b-form-select>
+
+                        <b-input-group-append>
+                          <b-button
+                            v-if="infoBus"
+                            variant="success"
+                            @click="
+                              updateHour(temp[`${radio}`][row.index], row.index)
+                            "
+                          >
+                            <b-icon-check></b-icon-check>
+                          </b-button>
+
+                          <b-button
+                            v-else
+                            variant="danger"
+                            @click="row.toggleDetails"
+                          >
+                            <b-icon-dash-circle></b-icon-dash-circle>
+                          </b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </template>
+                    <template #table-busy>
+                      <div class="text-center text-success my-2">
+                        <b-spinner class="align-middle"></b-spinner>
+                        <strong>Aguarde...</strong>
+                      </div>
+                    </template>
+                  </b-table>
+                </div>
               </div>
             </div>
           </form>
@@ -259,7 +297,7 @@
               Salvar
             </button>
             <button
-              v-if="!add"
+              v-else
               type="button"
               class="btn btn-success btn-block"
               @click="upSchedule()"
@@ -290,6 +328,9 @@ export default {
   },
   data() {
     return {
+      dismissSecs: 5,
+      dismissCountDown: 0,
+      isBusy: false,
       jsonHour: json,
       show: false,
       showTable: false,
@@ -307,11 +348,11 @@ export default {
       table: [],
       temp: [],
       form: {
-        id: "",
-        start: "",
-        end: "",
-        busId: "",
-        bus: "",
+        id: null,
+        start: null,
+        end: null,
+        busId: null,
+        bus: null,
       },
       fields: [
         {
@@ -327,10 +368,10 @@ export default {
           label: "Chegada",
         },
         {
-          key: "busId",
+          key: "id",
           label: "Ônibus",
           formatter: (value) => {
-            var data = this.bus.filter((item) => item.value == value);
+            var data = this.bus.filter((item) => item.id == value);
             return data[0];
           },
         },
@@ -648,6 +689,7 @@ export default {
         },
       ],
       lineSelected: null,
+      busSelected: null,
       infoBus: true,
       replyTable: false,
       replyTemp: [],
@@ -672,14 +714,21 @@ export default {
     });
   },
   methods: {
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
+    showAlert() {
+      this.dismissCountDown = this.dismissSecs;
+    },
     getBus() {
       this.$http
         .get("bus")
         .then((res) => {
           // console.log(res.data);
-          this.bus = res.data.map(function (item) {
-            return { value: item.id, text: item.description };
-          });
+          this.bus = res.data;
+          // this.bus = res.data.map(function (item) {
+          //   return { value: item.id, text: item.description };
+          // });
           // console.log(res.data);
           // console.log(this.bus);
           // barramento.$emit("loadMain", false);
@@ -690,6 +739,7 @@ export default {
         });
     },
     findHour() {
+      //104C ou 104B
       let id = `${
         this.lineSelected[0].number
       }${this.lineSelected[0].sense.slice(0, 1)}`;
@@ -701,36 +751,42 @@ export default {
           let data = {
             start: hour[0].hours[c][l],
             end: hour[0].hours[c][length - 1],
-            busId: 1,
+            id: 1,
             bus: "NÃO INFORMADO",
+            busId: null,
           };
           this.hoursSchedule.push(data);
         }
       }
       console.log(this.hoursSchedule);
-      // console.log(this.lineSelected[0].weekdays);
-      //console.log(hour);
+      // this.hour[1].push(this.hoursSchedule)
+
+      // console.log(this.hour[1]);
     },
     findBus(id) {
-      console.log(id);
-      $("#modalBus").modal("hide");
-      barramento.$emit("loadMain", true);
-      this.$http
-        .get(`lines/busLocationt/${id}`)
-        .then((res) => {
-          console.log(res.data);
-          this.infoBus = true;
-          // res.data.length > 0 ? (this.infoBus = true) : this.notFoundBus();
+      this.busSelected = this.filterBus(id);
+      this.form.id = this.busSelected[0].id;
+      this.form.busId = this.busSelected[0].idBus;
+      this.form.bus = this.busSelected[0].description;
+      // $("#modalBus").modal("hide");
+      // barramento.$emit("loadMain", true);
+      // this.$http
+      //   .get(`lines/busLocationt/${id}`)
+      //   .then((res) => {
+      //     console.log(res.data);
+      //     this.infoBus = true;
 
-          barramento.$emit("loadMain", false);
-          $("#modalBus").modal();
-        })
-        .catch(function (error) {
-          barramento.$emit("loadMain", false);
-          $("#modalBus").modal();
-          // barramento.$emit("loadMain", false);
-          console.log(error);
-        });
+      // res.data.length > 0 ? (this.infoBus = true) : this.notFoundBus();
+
+      //   barramento.$emit("loadMain", false);
+      //   $("#modalBus").modal();
+      // })
+      // .catch(function (error) {
+      //   barramento.$emit("loadMain", false);
+      //   $("#modalBus").modal();
+      //   // barramento.$emit("loadMain", false);
+      //   console.log(error);
+      // });
 
       // setTimeout(() => {
       //   barramento.$emit("loadMain", false);
@@ -746,21 +802,30 @@ export default {
     week(data) {
       this.table = this.hour[`${data}`];
     },
+    cleanForm() {
+      this.form.id = null;
+      this.form.busId = null;
+      this.form.bus = null;
+      this.form.start = null;
+      this.form.end = null;
+      this.show = false;
+    },
     addHour(data) {
       if (this.validBus(data)) {
         alert("O Horário e Ônibus já está em utiliazação");
       } else {
-        var bus = this.bus.filter((item) => item.value == data.busId);
         this.table[`${this.radio}`].push({
+          id: data.id,
           end: data.end,
           start: data.start,
           busId: data.busId,
-          bus: bus[0].text,
+          bus: data.bus,
         });
         let result = JSON.parse(JSON.stringify(this.table));
         this.table = result;
         alert("horário adicionado!");
       }
+      // this.cleanForm();
     },
     delHour(index) {
       if (
@@ -774,28 +839,38 @@ export default {
       }
     },
     updateHour(hour, row) {
-      // console.log(hour, row)
       let data = JSON.parse(JSON.stringify(hour));
+      console.log("linha => " + row);
       if (this.validBus(data)) {
         alert("O Horário e Ônibus está em utiliazação!");
       } else {
-        var bus = this.bus.filter((item) => item.value == data.busId);
+        let after = this.filterBus(data.id);
+        // console.log(after);
         let result = this.table[`${this.radio}`].map(function (item, index) {
           if (index === row) {
             return {
               start: data.start,
               end: data.end,
-              busId: data.busId,
-              bus: bus[0].text,
+              id: data.id,
+              busId: after[0].idBus,
+              bus: after[0].description,
             };
           } else {
-            return item;
+            return {
+              start: item.start,
+              end: item.end,
+              id: item.id,
+              busId: item.busId,
+              bus: item.bus,
+              // busId: this.table[`${this.radio}`][row].busId,
+              // bus: this.table[`${this.radio}`][row].bus,
+            };
           }
         });
         this.table[`${this.radio}`] = result;
         const temp = JSON.parse(JSON.stringify(this.table));
         this.table = temp;
-        // console.log(this.table);
+        console.log(this.table);
       }
     },
     select(id) {
@@ -804,8 +879,9 @@ export default {
       // console.log(data[0])
 
       if (this.lineSelected[0].schedules) {
-        this.findHour();
+        // this.findHour();
         this.hour = this.lineSelected[0].schedules.hour.weekdays;
+        // this.hour = { 0: [], 1: this.hoursSchedule, 6: [], 7: [], 8: [] }
         this.holiday = this.lineSelected[0].schedules.hour.holiday;
         this.holidayx = this.lineSelected[0].schedules.hour.holidayx;
         this.schedule_id = this.lineSelected[0].schedules.id;
@@ -821,6 +897,7 @@ export default {
       this.getBus();
     },
     addSchedule() {
+      this.isBusy = !this.isBusy;
       let data = {
         holiday: this.holiday,
         holidayx: this.holidayx,
@@ -832,43 +909,45 @@ export default {
           hour: data,
         })
         .then(() => {
-          this.getBus();
-          $("#modalBus").modal("hide");
-          barramento.$emit("edited", "Dados de horários salvos!");
+          this.isBusy = !this.isBusy;
+          this.showAlert();
+          // barramento.$emit("edited", "Dados de horários salvos!");
         })
         .catch(function (error) {
+          this.isBusy = !this.isBusy;
           console.log(error.response);
         });
       console.log(this.table);
     },
     upSchedule() {
-      barramento.$emit("loadMain", true);
+      this.getBus();
+      this.isBusy = !this.isBusy;
       let data = {
         holiday: this.holiday,
         holidayx: this.holidayx,
         weekdays: {},
       };
       data.weekdays = this.table;
-      // console.log(data);
       this.$http
         .put(`schedules/${this.schedule_id}`, {
           hour: data,
         })
         .then(() => {
           this.getBus();
-          $("#modalBus").modal("hide");
-          barramento.$emit("loadMain", false);
-          barramento.$emit("edited", "Dados de horários salvos!");
+          this.isBusy = !this.isBusy;
+          this.showAlert();
+          // barramento.$emit("edited", "Dados de horários salvos!");
         })
         .catch(function (error) {
           console.log(error);
         });
     },
     validBus(data) {
+      // console.log(data);
       return (
         this.table[`${this.radio}`].filter(
           (item) =>
-            item.busId == data.busId &&
+            item.id == data.id &&
             item.start == data.start &&
             item.end == data.end
         ).length > 0
@@ -891,25 +970,8 @@ export default {
         alert("Dados inseridos!");
       }
     },
-    upCar(data, row) {
-      var bus = this.bus.filter((item) => item.value == data);
-      let result = this.table[`${this.radio}`].map(function (item) {
-        // console.log(item.bus,row.bus, bus[0].text);
-        if (item.bus === row.bus) {
-          return {
-            start: item.start,
-            end: item.end,
-            busId: Number(bus[0].value),
-            bus: String(bus[0].text),
-          };
-        } else {
-          return item;
-        }
-      });
-      this.table[`${this.radio}`] = result;
-      const temp = JSON.parse(JSON.stringify(this.table));
-      this.table = temp;
-      console.log(this.table);
+    filterBus(id) {
+      return this.bus.filter((item) => item.id === id);
     },
   },
   watch: {

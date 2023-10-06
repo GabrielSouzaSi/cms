@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import login from '../auth/auth'
 import Home from '@/views/Dashboard'
 import Login from '@/views/Login'
+import PrintHoursPDF from '@/views/Horarios'
 // import Chart from '@/components/charts/Chart'
 import Event from '@/components/events/Event'
 import Category from '@/components/category/Category'
@@ -36,6 +37,10 @@ const router = new Router({
         //     path: '/',
         //     component: DataTableEvents
         // },
+        {
+            path: '/imprimirHorarios',
+            component: PrintHoursPDF
+        },
         {
             path: '/login',
             component: Login
@@ -83,7 +88,7 @@ const router = new Router({
                     components: {
                         cms: Event
                     }
-                }
+                },
             ]
         }
     ]
