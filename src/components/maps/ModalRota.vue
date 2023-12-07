@@ -1,116 +1,132 @@
 <template>
   <!-- The Modal -->
-  <div id="modalLine" class="modal">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Rotas</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
+  <div>
+    <b-modal
+      id="editRoute"
+      size="xl"
+      :title="!form.id ? 'Adicionar Rota' : 'Atualizar Rata'"
+      hide-footer
+      :no-close-on-backdrop="true"
+    >
+      <b-container>
+        <b-form @submit.stop.prevent="addLine">
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="number-input-group"
+                label="Número"
+                label-for="number"
+              >
+                <b-form-input
+                  id="number"
+                  name="number"
+                  type="number"
+                  v-model="$v.form.number.$model"
+                  :state="validateState('number')"
+                  aria-describedby="validNumber"
+                ></b-form-input>
 
-        <!-- Modal body -->
-        <div class="modal-body">
-          <form action>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="numberRota">Número:</label>
+                <b-form-invalid-feedback id="validNumber"
+                  >Campo obrigatório!</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+
+            <b-col>
+              <b-form-group
+                id="sense-input-group"
+                label="Sentido"
+                label-for="sense"
+              >
+                <b-form-select
+                  id="sense"
+                  name="sense"
+                  v-model="$v.form.sense.$model"
+                  :state="validateState('sense')"
+                  aria-describedby="validsense"
+                >
+                  <b-form-select-option value="BAIRRO"
+                    >BAIRRO</b-form-select-option
+                  >
+                  <b-form-select-option value="CENTRO"
+                    >CENTRO</b-form-select-option
+                  >
+                </b-form-select>
+
+                <b-form-invalid-feedback id="validSense"
+                  >Campo obrigatório!</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+
+            <b-col>
+              <b-form-group
+                id="description-input-group"
+                label="Nome da Rota"
+                label-for="description"
+              >
+                <b-form-input
+                  id="description"
+                  name="description"
+                  v-model="$v.form.description.$model"
+                  :state="validateState('description')"
+                  aria-describedby="validDescription"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="validDescription"
+                  >Campo obrigatório!</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="file-input-group"
+                label="Coordenadas da Rota"
+                label-for="file"
+              >
+                <b-form-file
+                  id="file"
+                  accept=".csv"
+                  @change="getFile"
+                  :placeholder="file"
+                >
+                  <template slot="file-name" slot-scope="{ names }">
+                    <b-badge variant="secondary" class="mr-2"
+                      >{{ names[0] ? "":"" }}{{ file }}</b-badge
+                    >
+                    <b-badge variant="primary" v-if="loadedFile">
+                      <b-spinner small type="grow"></b-spinner>
+                      Carregando...
+                    </b-badge>
+                  </template>
+                </b-form-file>
+                <!-- <div class="custom-file">
                   <input
-                    type="number"
-                    class="form-control"
-                    id="numberRota"
-                    placeholder="Número"
-                    name="numberRota"
-                    v-model.number="form.number"
-                    required
+                    type="file"
+                    class="custom-file-input"
+                    accept=".csv"
+                    @change="getFile"
+                    id="inputGroupFile01"
+                    aria-describedby="inputGroupFileAddon01"
                   />
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label for="senseRota">Sentido:</label>
-                  <select id="senseRota" class="form-control" v-model="form.sense">
-                    <option>Centro</option>
-                    <option>Bairro</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label for="adressRota">Nome da rota:</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="adressRota"
-                    placeholder="Nome"
-                    name="adressRota"
-                    v-model.trim="form.description"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-group my-3">
-                  <div class="custom-file">
-                    <input
-                      type="file"
-                      class="custom-file-input"
-                      accept=".csv"
-                      @change="getFile"
-                      id="inputGroupFile01"
-                      aria-describedby="inputGroupFileAddon01"
-                    />
-                    <label class="custom-file-label" for="inputGroupFile01">{{file}}</label>
-                  </div>
-                </div>
-              </div>
-              <!-- <div class="col">
-                <div class="form-group">
-                  <label for="latA">Origem:</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="latA"
-                    placeholder="Latitude"
-                    name="latA"
-                    v-model="form.latA"
-                  />
-                  <input
-                    type="number"
-                    class="form-control mt-1"
-                    id="lgtA"
-                    placeholder="Longitude"
-                    name="lgtA"
-                    v-model="form.lgtA"
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label for="lgtB">Destino:</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="latB"
-                    placeholder="Latitude"
-                    name="latB"
-                    v-model="form.latB"
-                  />
-                  <input
-                    type="number"
-                    class="form-control mt-1"
-                    id="lgtB"
-                    placeholder="Longitude"
-                    name="lgtB"
-                    v-model="form.lgtB"
-                  />
-                </div>
-              </div>-->
-            </div>
-            <div class="row">
-              <div class="col">
+                  <label class="custom-file-label" for="inputGroupFile01">{{
+                    file
+                  }}</label>
+                </div> -->
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="points-input-group"
+                label="Selecionar Ponto de ônibus"
+                label-for="points"
+              >
                 <multiselect
                   v-model="value"
                   :options="data"
@@ -118,11 +134,11 @@
                   :close-on-select="false"
                   :clear-on-select="false"
                   :preserve-search="false"
-                  placeholder="Selecionar parada"
+                  placeholder="Clique aqui!"
                   label="text"
                   track-by="id"
                   selectLabel="Clique para selecionar"
-                  selectedLabel="selecionardo"
+                  selectedLabel="Selecionado"
                   deselectLabel="Clique para remover"
                   :preselect-first="false"
                 >
@@ -130,49 +146,40 @@
                     <span
                       class="multiselect__single"
                       v-if="(values.length &amp;&amp; !isOpen)"
-                    >{{ value.length }} paradas selecionadas!</span>
+                      >{{ value.length }} paradas selecionadas!</span
+                    >
                   </template>
                 </multiselect>
-              </div>
-            </div>
-          </form>
-        </div>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <!-- Modal footer -->
-        <div class="modal-footer">
-          <div class="col">
-            <button
-              type="button"
-              class="btn btn-danger btn-block"
-              @click="cancel(line)"
-              data-dismiss="modal"
-            >Cancelar</button>
-          </div>
-          <div class="col">
-            <button
-              v-if="add"
-              type="button"
-              class="btn btn-success btn-block"
-              @click="addLine(form)"
-            >Salvar</button>
-            <button
-              v-if="!(add)"
-              type="button"
-              class="btn btn-success btn-block"
-              @click="update(form)"
-            >Salvar</button>
-          </div>
-        </div>
-      </div>
-    </div>
+          <b-row>
+            <b-col>
+              <b-button block @click="resetForm()">Cancelar</b-button>
+            </b-col>
+            <b-col>
+              <b-button v-if="!form.id" block type="submit" variant="primary"
+                >Salvar</b-button
+              >
+              <b-button v-else block @click="update()" variant="success"
+                >Atualizar</b-button
+              >
+            </b-col>
+          </b-row>
+        </b-form>
+      </b-container>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import $ from "jquery";
+import { validationMixin } from "vuelidate";
+import { required } from "vuelidate/lib/validators";
 import barramento from "@/eventBus/barramento";
 
 export default {
+  mixins: [validationMixin],
   props: {
     points: {
       type: Array,
@@ -183,69 +190,49 @@ export default {
       data: [],
       line: null,
       add: false,
+      loadedFile: false,
       file: "Selecionar arquivo CSV!",
       inputFile: true,
-      selected: "",
-      items: [],
       form: {
         id: null,
         number: null,
-        sense: "",
-        description: "",
+        sense: null,
+        description: null,
         fileData: [],
         points: [],
       },
-      fields: [
-        {
-          key: "number",
-          label: "Nº",
-          variant: "info",
-        },
-        {
-          key: "sense",
-          label: "Sentido",
-        },
-        {
-          key: "adress",
-          label: "Endereço",
-        },
-        {
-          key: "district",
-          label: "Bairro",
-        },
-        {
-          key: "actions",
-          label: "Ações",
-        },
-      ],
       value: [],
-      options: [
-        { name: "Vue.js", language: "JavaScript" },
-        { name: "Adonis", language: "JavaScript" },
-        { name: "Rails", language: "Ruby" },
-        { name: "Sinatra", language: "Ruby" },
-        { name: "Laravel", language: "PHP" },
-        { name: "Phoenix", language: "Elixir" },
-      ],
       message: "",
     };
   },
+  validations: {
+    form: {
+      number: {
+        required,
+      },
+      sense: {
+        required,
+      },
+      description: {
+        required,
+      },
+    },
+  },
   created() {
     barramento.$on("line", (line) => {
-      this.cancel(line);
-      $("#modalLine").modal();
-    });
-  },
-  methods: {
-    cancel(line) {
+      this.data = this.points?.map((item) => {
+        return {
+          id: item.id,
+          text: item.number + " " + item.address,
+        };
+      });
       if (line) {
-        this.line = line;
+        this.line = line; //pontos da linha
         let data = JSON.parse(JSON.stringify(line));
-        this.add = false;
-        this.value = data.points.map(function (item) {
+        this.value = data.points.map((item) => {
           return {
             id: item.id,
-            text: item.number + " " + item.address
+            text: item.number + " " + item.address,
           };
         });
         this.form.id = data.id;
@@ -254,29 +241,44 @@ export default {
         this.form.description = data.description;
         this.form.fileData = data.route;
         this.file = data.route.length + " pontos totais!";
-        // console.log(this.value);
-        this.getPointLine(data);
       } else {
-        this.file = "Selecionar arquivo CSV!";
-        this.value = [];
-        this.items = [];
-        this.form.id = null;
-        this.form.number = null;
-        this.form.sense = "";
-        this.form.description = "";
-        this.form.fileData = [];
-        this.add = true;
+        this.resetForm();
       }
+      this.$bvModal.show("editRoute");
+    });
+  },
+  methods: {
+    validateState(name) {
+      const { $dirty, $error } = this.$v.form[name];
+      return $dirty ? !$error : null;
     },
-    addLine(value) {
-      $("#modalLine").modal("hide");
+    resetForm() {
+      this.$bvModal.hide("editRoute");
+      this.file = "Selecionar arquivo CSV!";
+      this.value = [];
+      this.form = {
+        id: null,
+        number: null,
+        sense: null,
+        description: null,
+        fileData: [],
+        points: [],
+      };
+
+      this.$nextTick(() => {
+        this.$v.$reset();
+      });
+    },
+    addLine() {
+      this.$v.form.$touch();
+      if (this.$v.form.$anyError) return;
       barramento.$emit("loadMain", true);
       this.compare();
       this.$http
         .post("lines", {
-          number: value.number,
-          sense: value.sense.toUpperCase(),
-          description: value.description.toUpperCase(),
+          number: this.form.number,
+          sense: this.form.sense.toUpperCase(),
+          description: this.form.description.toUpperCase(),
           route: this.form.fileData,
         })
         .then((res) => {
@@ -288,6 +290,7 @@ export default {
             " - " +
             res.data.sense +
             " criado com sucesso! Esse aviso será encerrado em ";
+          alert("Id: " + res.data.id);
           this.addPointLine(res.data.id);
         })
         .catch(function (error) {
@@ -297,24 +300,23 @@ export default {
     },
     addPointLine(id) {
       if (this.value.length < 1) {
-        $("#modalLine").modal("hide");
+        this.$bvModal.hide("editRoute");
         barramento.$emit("loadMain", false);
         barramento.$emit("creatPoint", this.message);
         console.log("Não tem parada!");
       } else {
-        console.log("tem parada!");
         this.$http
           .put(`lines/${id}/points/sync`, {
             points: this.form.points,
           })
           .then((res) => {
-            console.log(res);
-            $("#modalLine").modal("hide");
+            if(res){
+            this.$bvModal.hide("editRoute");
             barramento.$emit("loadMain", false);
-            barramento.$emit("creatPoint", this.message);
+            barramento.$emit("creatPoint", this.message);}
           })
           .catch(function (error) {
-            $("#modalLine").modal("hide");
+            this.$bvModal.hide("editRoute");
             barramento.$emit("loadMain", false);
             console.log(error.response);
             alert(error.response.data.message[0].message);
@@ -322,8 +324,8 @@ export default {
       }
     },
     delPointLine(id) {
-      var delpoint = Array();
-      this.line.points.map(function (item) {
+      var delpoint = [];
+      this.line.points.map((item) => {
         delpoint.push(item.id);
       });
       this.$http
@@ -336,59 +338,52 @@ export default {
             this.addPointLine(id);
           } else {
             barramento.$emit("loadMain", false);
-            $("#modalLine").modal("hide");
+            this.$bvModal.hide("editRoute");
           }
         })
         .catch(function (error) {
           barramento.$emit("loadMain", false);
-          $("#modalLine").modal("hide");
+          this.$bvModal.hide("editRoute");
           console.log(error.response);
           alert(error.response.data.message[0].message);
         });
     },
-    update(value) {
-      if (
-        value.number == this.line.number &&
-        value.sense == this.line.sense &&
-        value.description == this.line.description &&
-        this.inputFile &&
-        this.compare()
-      ) {
-        $("#modalLine").modal("hide");
-        alert("Os dados não foram alterados!");
-      } else {
-        barramento.$emit("loadMain", true);
-        this.$http
-          .put(`lines/${value.id}`, {
-            number: value.number,
-            sense: value.sense.toUpperCase(),
-            description: value.description.toUpperCase(),
-            route: this.form.fileData,
-            points: this.form.points
-          })
-          .then((res) => {
-            console.log(res);
+    update() {
+      this.$bvModal.hide("editRoute");
+      console.log("pointIds" + this.form.points); // Pontos iniciais
+      this.getPointLine(JSON.parse(JSON.stringify(this.value))); // pontos alterados ou não
+      barramento.$emit("loadMain", true);
+      this.$http
+        .put(`lines/${this.form.id}`, {
+          number: this.form.number,
+          sense: this.form.sense.toUpperCase(),
+          description: this.form.description.toUpperCase(),
+          route: this.form.fileData,
+          points: this.form.points,
+        })
+        .then((res) => {
+          if(res){
             this.message =
-                "Linha " +
-                this.form.number +
-                " - " +
-                this.form.description +
-                " - " +
-                this.form.sense +
-                " editado com sucesso! Esse aviso será encerrado em ";
-            if (this.line.points.length > 0) {
-              // alert("Os dados foram alterados!detach");
-              this.delPointLine(value.id);
-            } else {
-              // alert("Os dados foram alterados!sync");
-              this.addPointLine(value.id);
-            }
-          })
-          .catch(function (error) {
-            barramento.$emit("loadMain", false);
-            console.log(error);
-          });
-      }
+            "Linha " +
+            this.form.number +
+            " - " +
+            this.form.description +
+            " - " +
+            this.form.sense +
+            " editado com sucesso! Esse aviso será encerrado em ";
+          }
+          if (this.line.points.length > 0) {
+            // alert("Os dados foram alterados!detach");
+            this.delPointLine(this.form.id);
+          } else {
+            // alert("Os dados foram alterados!sync");
+            this.addPointLine(this.form.id);
+          }
+        })
+        .catch(function (error) {
+          barramento.$emit("loadMain", false);
+          console.log(error);
+        });
     },
     // Função para deletar parada passando id como parametro
     delPoint(value) {
@@ -398,19 +393,13 @@ export default {
       let result = array.indexOf(value);
       //exclui o elemento do array
       array.splice(result, 1);
-      //atualiza o array que é utilizado na função update
+      //atualiza o array
       this.form.points = array;
-
-      let point = this.items;
-
-      point.splice(result, 1);
-
-      this.items = point;
     },
     // A função preparar um array para receber o id dos pontos da rota
-    getPointLine(line) {
+    getPointLine(points) {
       let array = [];
-      line.points.map(function (item) {
+      points.map((item) => {
         array.push(item.id);
       });
       this.form.points = array;
@@ -435,12 +424,14 @@ export default {
       }
     },
     //Ler o arquivo csv e guarda os dados
-    getFile() {
+    getFile(event) {
+      // console.log(event);
+      this.file = "";
+      this.loadedFile = true;
       var file = event.target.files[0];
       this.inputFile = true;
       if (event.target.files[0]) {
         this.inputFile = false;
-        this.file = file.name;
 
         let results;
 
@@ -453,22 +444,23 @@ export default {
         });
 
         setTimeout(() => {
-          var route = Array();
-          results.map(function (item) {
+          var route = [];
+          results.map((item) => {
             if (item.LAT && item.LONG) {
               route.push([item.LAT, item.LONG]);
             }
           });
           this.form.fileData = route;
+          this.loadedFile = false;
           this.file =
             file.name + " " + this.form.fileData.length + " pontos lidos!";
         }, 2000);
       }
-    }
+    },
   },
   watch: {
     points(v1) {
-      var obj = v1.map(function (item) {
+      var obj = v1.map((item) => {
         return {
           id: item.id,
           text: item.number + " " + item.address,

@@ -12,8 +12,8 @@ Vue.component('multiselect', Multiselect)
 Vue.use(VuePapaParse)
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyASgXTBHBFBtuym2uUAClfIWzJvdcgXY48',
-    // libraries: 'places'
+    key: 'AIzaSyA5qpSYHHNzyESgQB78aSYHz1a6gX7rwiQ',
+    libraries: 'places'
   }
 });
 

@@ -1,196 +1,200 @@
 <template>
-  <!-- The Modal -->
-  <div id="editPoint" class="modal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Ponto de Parada</h4>
-          <button type="button" class="close" data-dismiss="modal">
-            &times;
-          </button>
-        </div>
+  <div>
+    <b-modal
+      id="editPoint"
+      size="lg"
+      title="Ponto de Ônibus"
+      centered
+      hide-footer
+    >
+      <b-container>
+        <b-form @submit.stop.prevent="addPoint">
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="number-input-group"
+                label="Número"
+                label-for="number"
+              >
+                <b-form-input
+                  id="number"
+                  name="number"
+                  type="number"
+                  v-model="$v.form.number.$model"
+                  :state="validateState('number')"
+                  aria-describedby="validNumber"
+                ></b-form-input>
 
-        <!-- Modal body -->
-        <div class="modal-body">
-          <form action>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="number">Número:</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="number"
-                    placeholder="Número"
-                    name="number"
-                    v-model.number="form.number"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="adress">Endereço:</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="adress"
-                    placeholder="Endereço"
-                    name="adress"
-                    v-model.trim="form.address"
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label for="district">Bairro:</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="district"
-                    placeholder="Bairro"
-                    name="district"
-                    v-model.trim="form.district"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="lat">Latitude:</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="lat"
-                    placeholder="Latitude"
-                    name="lat"
-                    v-model="form.lat"
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label for="lgt">Longitude:</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="lgt"
-                    placeholder="Longitude"
-                    name="lgt"
-                    v-model="form.lgt"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label>É Climatizado?</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-2">
-                <div class="form-check">
-                  <label class="form-check-label">
-                    <input
-                      type="radio"
-                      class="form-check-input"
-                      name="optradio"
-                      v-model="form.climatizado"
-                      value="true"
-                    />Sim
-                  </label>
-                </div>
-              </div>
-              <div class="col-2">
-                <div class="form-check">
-                  <label class="form-check-label">
-                    <input
-                      type="radio"
-                      class="form-check-input"
-                      name="optradio"
-                      v-model="form.climatizado"
-                      value="false"
-                    />Não
-                  </label>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
+                <b-form-invalid-feedback id="validNumber"
+                  >Campo obrigatório!</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <!-- Modal footer -->
-        <div class="modal-footer">
-          <div class="col">
-            <button
-              type="button"
-              class="btn btn-danger btn-block"
-              data-dismiss="modal"
-            >
-              Cancelar
-            </button>
-          </div>
-          <div class="col">
-            <button
-              v-if="add"
-              type="button"
-              class="btn btn-success btn-block"
-              @click="addPoint(form)"
-            >
-              Salvar
-            </button>
-            <button
-              v-else
-              type="button"
-              class="btn btn-success btn-block"
-              @click="update(form)"
-            >
-              Salvar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="address-input-group"
+                label="Endereço"
+                label-for="address"
+              >
+                <b-form-input
+                  id="address"
+                  name="address"
+                  v-model="$v.form.address.$model"
+                  :state="validateState('address')"
+                  aria-describedby="validAddress"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="validAddress"
+                  >Campo obrigatório!</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+            <b-col>
+              <b-form-group
+                id="district-input-group"
+                label="Bairro"
+                label-for="district"
+              >
+                <b-form-input
+                  id="district"
+                  name="district"
+                  v-model="$v.form.district.$model"
+                  :state="validateState('district')"
+                  aria-describedby="validDistrict"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="validDistrict"
+                  >Campo obrigatório!</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="lat-input-group"
+                label="Latitude"
+                label-for="lat"
+              >
+                <b-form-input
+                  id="lat"
+                  name="lat"
+                  v-model="$v.form.lat.$model"
+                  :state="validateState('lat')"
+                  aria-describedby="validLat"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="validLat"
+                  >No mínimo 7 caracteres!</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+            <b-col>
+              <b-form-group
+                id="lgt-input-group"
+                label="Longitude"
+                label-for="lgt"
+              >
+                <b-form-input
+                  id="lgt"
+                  name="lgt"
+                  v-model="$v.form.lgt.$model"
+                  :state="validateState('lgt')"
+                  aria-describedby="validLgt"
+                ></b-form-input>
+
+                <b-form-invalid-feedback id="validLat"
+                  >No mínimo 7 caracteres!</b-form-invalid-feedback
+                >
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col>
+              <b-form-group label="É climatizado?">
+                <b-form-checkbox
+                  id="checkbox-climatizado"
+                  name="climatizado"
+                  value="true"
+                  v-model="form.climatizado"
+                  unchecked-value="false"
+                  >Sim</b-form-checkbox
+                >
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col>
+              <b-button block @click="resetForm()">Cancelar</b-button>
+            </b-col>
+            <b-col>
+              <b-button v-if="!form.id" block type="submit" variant="primary"
+                >Salvar</b-button
+              >
+              <b-button v-else block @click="update()" variant="success"
+                >Atualizar</b-button
+              >
+            </b-col>
+          </b-row>
+        </b-form>
+      </b-container>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import $ from "jquery";
+import { validationMixin } from "vuelidate";
+import { required, minLength } from "vuelidate/lib/validators";
 import barramento from "@/eventBus/barramento";
+
 export default {
-  props: {
-    data: {
-      type: Array,
-    },
-  },
+  mixins: [validationMixin],
   data() {
     return {
-      map: null,
-      loader: null,
       point: null,
       pointB: null,
-      add: false,
       form: {
         id: null,
         number: null,
-        address: "",
-        district: "",
-        lat: "",
-        lgt: "",
-        climatizado: null,
+        address: null,
+        district: null,
+        lat: null,
+        lgt: null,
+        climatizado: false,
       },
     };
+  },
+  validations: {
+    form: {
+      number: {
+        required,
+      },
+      address: {
+        required,
+      },
+      district: {
+        required,
+      },
+      lat: {
+        required,
+        minLength: minLength(7),
+      },
+      lgt: {
+        required,
+        minLength: minLength(7),
+      },
+    },
   },
   created() {
     barramento.$on("point", (point) => {
       // var data = Object.values(point)
-      // console.log(point);
-
       if (point) {
-        this.add = false;
         this.point = point;
         this.form.id = point.id;
         this.form.number = point.number;
@@ -200,89 +204,110 @@ export default {
         this.form.lgt = point.lgt;
         this.form.climatizado = point["air-conditioning"];
       } else {
-        this.add = true;
-        this.form.id = null;
-        this.form.number = null;
-        this.form.address = "";
-        this.form.district = "";
-        this.form.lat = "";
-        this.form.lgt = "";
-        this.form.climatizado = null;
+        this.resetForm();
       }
-      $("#editPoint").modal();
+      this.$bvModal.show("editPoint");
     });
   },
   methods: {
-    update(value) {
+    validateState(name) {
+      const { $dirty, $error } = this.$v.form[name];
+      return $dirty ? !$error : null;
+    },
+    resetForm() {
+      this.$bvModal.hide("editPoint");
+      this.form = {
+        id: null,
+        number: null,
+        address: null,
+        district: null,
+        lat: null,
+        lgt: null,
+        climatizado: false,
+      };
+
+      this.$nextTick(() => {
+        this.$v.$reset();
+      });
+    },
+    addPoint() {
+      this.$v.form.$touch();
+      console.log("adicionar: ", this.form);
+      if (!this.$v.form.$anyError) {
+        this.$bvModal.hide("editPoint");
+        barramento.$emit("loadMain", true);
+        this.$http
+          .post("points", {
+            number: Number(this.form.number),
+            address: this.form.address.toUpperCase(),
+            district: this.form.district.toUpperCase(),
+            lat: this.form.lat,
+            lgt: this.form.lgt,
+            "air-conditioning": this.form.climatizado,
+          })
+          .then((res) => {
+            barramento.$emit("upPoints");
+            barramento.$emit(
+              "creatPoint",
+              "Parada Nº" +
+                res.data.number +
+                " criado com sucesso! Esse aviso será encerrado em "
+            );
+          })
+          .catch(function (error) {
+            barramento.$emit("loadMain", false);
+            console.log(error.response);
+            alert(error.response.data.message[0].message);
+          });
+      }
+    },
+    update() {
+      this.$v.form.$touch();
+      if (this.$v.form.$anyError) return;
       console.log("atualizar!");
-      value.climatizado == "true" ? (this.pointB = 1) : (this.pointB = 0);
-      console.log(value, this.pointB);
+      this.form.climatizado == "true" ? (this.pointB = 1) : (this.pointB = 0);
       if (
-        value.number == this.point.number &&
-        value.address == this.point.address &&
-        value.district == this.point.district &&
-        value.lat == this.point.lat &&
-        value.lgt == this.point.lgt &&
-        value.climatizado == this.point["air-conditioning"]
+        this.form.number == this.point.number &&
+        this.form.address == this.point.address &&
+        this.form.district == this.point.district &&
+        this.form.lat == this.point.lat &&
+        this.form.lgt == this.point.lgt &&
+        this.form.climatizado == this.point["air-conditioning"]
       ) {
-        $("#editPoint").modal("hide");
+        this.$bvModal.hide("editPoint");
         barramento.$emit(
           "alert",
           "Os dados não foram alterados! Esse aviso será encerrado em "
         );
       } else {
         let formData = new FormData();
-        formData.append("number", value.number),
-          formData.append("address", value.address),
-          formData.append("district", value.district),
-          formData.append("lat", value.lat),
-          formData.append("lgt", value.lgt),
+        formData.append("number", this.form.number),
+          formData.append("address", this.form.address),
+          formData.append("district", this.form.district),
+          formData.append("lat", Number(this.form.lat)),
+          formData.append("lgt", Number(this.form.lgt)),
           formData.append("air-conditioning", this.pointB),
           formData.append("_method", "PUT"),
-          this.$http.post(`points/${value.id}`, formData).then((res) => {
-            console.log(res.data);
-            $("#editPoint").modal("hide");
-            barramento.$emit(
-              "edited",
-              "Parada " +
-                value.number +
-                " editado com sucesso! Esse aviso será encerrado em "
-            );
-          })
-        .catch(function (error) {
-          console.log(error.response);
-          alert(error.response.data.message[0].message);
-        });
+          this.$http
+            .post(`points/${this.form.id}`, formData)
+            .then((res) => {
+              console.log(res.data);
+              this.$bvModal.hide("editPoint");
+              barramento.$emit("upPoints");
+              barramento.$emit(
+                "edited",
+                "Parada " +
+                  this.form.number +
+                  " editado com sucesso! Esse aviso será encerrado em "
+              );
+            })
+            .catch(function (error) {
+              barramento.$emit("loadMain", false);
+              console.log(error.response);
+              alert(error.response.data.message[0].message);
+            });
       }
-    },
-    addPoint(value) {
-      console.log(value);
-      this.$http
-        .post("points", {
-          number: value.number,
-          address: value.address,
-          district: value.district,
-          lat: value.lat,
-          lgt: value.lgt,
-          "air-conditioning": Boolean(value.climatizado),
-        })
-        .then((res) => {
-          $("#editPoint").modal("hide");
-          barramento.$emit(
-            "creatPoint",
-            "Parada Nº" +
-              res.data.number +
-              " criado com sucesso! Esse aviso será encerrado em "
-          );
-        })
-        .catch(function (error) {
-          console.log(error.response);
-          alert(error.response.data.message[0].message);
-        });
     },
   },
 };
 </script>
-
-<style>
-</style>

@@ -183,10 +183,12 @@ export default {
     },
     delPoint(value, id) {
       if (value) {
+        barramento.$emit("loadMain", true);
         this.$http
           .delete(`points/${id}`)
           .then(res => {
             if (res) {
+              barramento.$emit("upPoints");
               barramento.$emit(
                 "delPoint",
                 "Parada excluída com Secesso! Esse aviso será encerrado em "

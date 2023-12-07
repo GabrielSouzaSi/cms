@@ -34,11 +34,14 @@
                 class="dropdown-menu dropdown-menu-right"
                 aria-labelledby="rotas"
               >
+                <a class="dropdown-item" href="#" @click="creatLine()"
+                  >Adicionar Rota</a
+                >
                 <a class="dropdown-item" href="#" @click="editLines()"
                   >Editar Rota</a
                 >
-                <a class="dropdown-item" href="#" @click="creatLine()"
-                  >Adicionar Rota</a
+                <a class="dropdown-item" href="#" @click="deleteLine()"
+                  >Excluir Rota</a
                 >
               </div>
             </div>
@@ -774,6 +777,9 @@ export default {
       this.lines[this.index].points = table;
       console.log(table);
     });
+    barramento.$on("upPoints", () => {
+      this.getPoints();
+    });
     barramento.$on("creatPoint", (message) => {
       this.upLines();
       barramento.$emit("alert", message);
@@ -849,6 +855,57 @@ export default {
         );
       }
     },
+    deleteLine() {
+      if (this.selected) {
+        let line = this.lines.filter((item) => {
+          return item.id == this.selected;
+        });
+        this.$bvModal
+          .msgBoxConfirm(
+            `Deseja excluir a linha ${line[0].number} - ${line[0].description} - ${line[0].sense}?`,
+            {
+              title: "Confirmação",
+              size: "sm",
+              buttonSize: "sm",
+              okVariant: "danger",
+              okTitle: "SIM",
+              cancelTitle: "NÃO",
+              footerClass: "p-2",
+              hideHeaderClose: false,
+              centered: true,
+            }
+          )
+          .then((value) => {
+            this.delLine(value, this.selected);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
+        barramento.$emit(
+          "alert",
+          "Selecione a rota que deseja excluir! Esse aviso será encerrado em"
+        );
+      }
+    },
+    delLine(status, id) {
+      if (status) {
+        this.selected = null;
+        this.$http
+          .delete(`lines/${id}`)
+          .then((res) => {
+            if (res) {
+              barramento.$emit(
+                "edited",
+                "Linha excluída com Secesso! Esse aviso será encerrado em "
+              );
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+    },
     upLines() {
       this.$http
         .get("lines")
@@ -863,7 +920,14 @@ export default {
         });
     },
     openSchedule() {
-      barramento.$emit("mSchedule", this.selected);
+      if(this.selected){
+        barramento.$emit("mSchedule", this.selected);
+      }else {
+        barramento.$emit(
+          "alert",
+          "Selecione uma rota! Esse aviso será encerrado em"
+        );
+      }
     },
     addBus(i) {
       if (i < this.busOld.length) {

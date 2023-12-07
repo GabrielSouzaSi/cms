@@ -1,7 +1,7 @@
 <template>
   <!-- The Modal -->
   <div id="modalBus" class="modal">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <!-- Modal Header -->
         <div class="modal-header">
@@ -314,7 +314,7 @@
 <script>
 import $ from "jquery";
 import barramento from "@/eventBus/barramento";
-import json from "../../data_03072023.json";
+import json from "../../data_11092023.json";
 export default {
   props: {
     // todas as linha
@@ -740,6 +740,7 @@ export default {
     },
     findHour() {
       //104C ou 104B
+      this.hoursSchedule = [];
       let id = `${
         this.lineSelected[0].number
       }${this.lineSelected[0].sense.slice(0, 1)}`;

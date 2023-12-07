@@ -37,13 +37,13 @@
             :clickable="true"
             @click="toggleInfoWindow(m, i)"
           ></gmap-marker>
-          <gmap-marker
+          <!-- <gmap-marker
             :key="i"
             v-for="(m, i) in bus"
             :position="m.position"
             :clickable="true"
             @click="toggleInfoWindow(m, i)"
-          ></gmap-marker>
+          ></gmap-marker> -->
           <gmap-polyline
             :options="{ strokeColor: '#FF0000' }"
             :path="route"
@@ -138,17 +138,9 @@ export default {
     loadBus(){
       this.bus = [];
       this.$http
-        .get(`lines/search/${this.selected}`)
+        .get(`lines/${this.selected}`)
         .then(res => {
-          var veic = res.data.data[1].map(function(item) {
-            return {
-              position: { lat: Number(item.latitude), lng: Number(item.longitude) },
-              infoText: `<strong>Ônibus ${item.plate}</item>`
-            };
-          });
-          this.bus = veic;
-          // console.log('onibus',veic);
-          // console.log(res.data.data[1]);
+          console.log(res);
 
         })
         .catch(function(error) {
