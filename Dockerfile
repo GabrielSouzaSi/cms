@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8080
 
 # Start the Vue.js app
-CMD ["npm", "run", "serve"]
+# CMD ["npm", "run", "serve"]
