@@ -83,6 +83,7 @@ export default {
       user: {
         email: "",
         password: "",
+        device_name: "teste",
         token: "",
         authorizedUser: false,
       },
@@ -124,15 +125,19 @@ export default {
     async loginUser() {
       console.log('url='+process.env.VUE_APP_URL);
       try {
-        const res = await this.$oauth.post("/oauth/token", {
-          grant_type: "password",
-          client_id: process.env.VUE_APP_CLIENT_ID,
-          client_secret: process.env.VUE_APP_TOKEN_API,
-          username: this.user.email,
+        const res = await this.$oauth.post("/auth/token", {
+          // grant_type: "password",
+          // client_id: process.env.VUE_APP_CLIENT_ID,
+          // client_secret: process.env.VUE_APP_TOKEN_API,
+          // username: this.user.email,
+          // password: this.user.password,
+          email: this.user.email,
           password: this.user.password,
+          device_name: this.user.device_name,
         });
         var data = res;
-        this.user.token = data.data.access_token;
+        // console.log(data.data.token);
+        this.user.token = data.data.token;
         this.user.authorizedUser = true;
         this.show = false;
         this.auth(this.user);
