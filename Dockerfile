@@ -12,25 +12,16 @@ COPY package*.json ./
 # Install Vue CLI globally
 RUN npm install -g @vue/cli
 
-# Install project dependencies
-# RUN npm install
-
 # Copy the entire project to the working directory
 COPY . .
 
-
-# Start the Vue.js app
-# CMD ["npm", "run", "serve"]
-
-
-# teste stages
 # build stage
 FROM develop-stage as build-stage
 RUN npm install
-RUN vue build
+RUN npm run build
 
 # production stage
 FROM nginx:1.21.0-alpine as production-stage
-COPY --from=build-stage /app/dist/spa /usr/share/nginx/html
+COPY --from=build-stage /app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

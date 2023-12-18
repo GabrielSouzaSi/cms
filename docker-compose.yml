@@ -5,11 +5,24 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: build-stage
+      target: develop-stage
     image: vue-app
-    container_name: cms-vue-container
+    container_name: cms-vue-container-dev
     ports:
       - "8080:8080"
     volumes:
       - .:/app
     command: /bin/sh -c "npm install && npm run serve"
+
+  # vue-app-production:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: production-stage
+  #   image: vue-app
+  #   container_name: cms-vue-container-prod
+  #   ports:
+  #     - "8081:80"
+  #   volumes:
+  #     - .:/app
+    
